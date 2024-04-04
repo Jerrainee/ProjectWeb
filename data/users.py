@@ -18,8 +18,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
-    test_results = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    comments = orm.relationship("News", back_populates='user')
+    test_results = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    comments = orm.relationship("Comment", back_populates='user')
 
     def __repr__(self):
         return f"<User> {self.id} {self.name} {self.email}"

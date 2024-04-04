@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from UserLogin import UserLogin
 
+from forms.user import RegisterForm, LoginForm
+
 # -- Configuration --
 SECRET_KEY = '5728587e3f3ec902535e6ca60e1e98f7065dab376a661e05'
 DEBUG = True
@@ -132,7 +134,9 @@ def login():
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
+    form = RegisterForm()
     if request.method == "POST":
+    #    print(request.form)
         session.pop('_flashes', None)
         if len(request.form['psw']) > 4 and request.form['psw'] == request.form['psw2'] and \
                 dbase.getUser(request.form['id'])['psw'] == ".":
