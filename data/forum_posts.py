@@ -13,4 +13,4 @@ class Post(SqlAlchemyBase):
     content = sqlalchemy.Column(sqlalchemy.TEXT, nullable=False)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
-    messages = orm.relationship("forum_messages", back_populates='thread')
+    messages = orm.relationship("forum_messages")
