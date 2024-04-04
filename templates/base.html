@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang = "ru">
+	<head>
+		<meta charset = "utf-8">
+		<link type="text/css" href="{{ url_for('static', filename='css/styles.css')}}" rel="stylesheet" />
+		<title>Сайт с тестами</title>
+		<link rel="icon" href="" type="image/svg">
+	</head>
+	<body>
+		<h3>Сайт с тестами</h3>
+		<p><a href="/profile">Личный кабинет</a></p>
+        <ul class="no-bullet">
+			<li><a href="/">Главная</a></li>
+			<li><a href="/news">Новости</a></li>
+			<li><a href="/forum">Форум</a></li>
+			<li><a href='/support'>Support</a></li>
+		</ul>
+		{% block content %}
+
+        {% endblock %}
+	</body>
+</html>
