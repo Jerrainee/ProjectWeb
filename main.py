@@ -77,7 +77,7 @@ def test_run(n):
     if len(res) == 2:
         qst, ans = res
         form = TestForm(qst, ans).run_form()
-        render_template('test_run.html', form=form)
+        return render_template('test_run.html', form=form)
 
 
 def main():
