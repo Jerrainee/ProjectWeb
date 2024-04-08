@@ -78,16 +78,13 @@ def test_run(n):
         res = a.run(n)
         if len(res) == 2:
             qst, ans = res
-            form = TestForm() #qst, ans
-            print(qst, ans)
-            # form.answers = wtforms.fields.choices.RadioField(qst, choices=ans)
+            form = TestForm()
             form.answers.label = qst
             form.answers.choices = ans
-            print(request.method)
             return render_template('test_run.html', form=form)
     elif request.method == 'POST':
         print(request.form.get('answers'))
-        return ''
+        return '' # сделать переход на следующую страницу
 
 
 def main():
