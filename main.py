@@ -1,6 +1,7 @@
 import datetime
 
-from flask import Flask, render_template, redirect
+import wtforms
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user
 
 from data import db_session
@@ -72,12 +73,21 @@ def login():
 
 @app.route('/test_run/<int:n>', methods=['GET', 'POST'])
 def test_run(n):
-    a = Test('test1.json')
-    res = a.run(n)
-    if len(res) == 2:
-        qst, ans = res
-        form = TestForm(qst, ans).run_form()
-        render_template('test_run.html', form=form)
+    if request.method == 'GET':
+        a = Test('test1.json')
+        res = a.run(n)
+        if len(res) == 2:
+            qst, ans = res
+            form = TestForm() #qst, ans
+            print(qst, ans)
+            # form.answers = wtforms.fields.choices.RadioField(qst, choices=ans)
+            form.answers.label = qst
+            form.answers.choices = ans
+            print(request.method)
+            return render_template('test_run.html', form=form)
+    elif request.method == 'POST':
+        print(request.form.get('answers'))
+        return ''
 
 
 def main():
