@@ -10,6 +10,7 @@ class Test(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    description = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     data = sqlalchemy.Column(sqlalchemy.JSON, nullable=False)
     results = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    comments = orm.relationship('Comments')
+    comments = orm.relationship('Comment')

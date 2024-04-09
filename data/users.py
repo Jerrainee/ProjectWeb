@@ -13,13 +13,15 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    is_admin = sqlalchemy.Column(sqlalchemy.Boolean, nullable=False)
+    name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
-    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     test_results = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    comments = orm.relationship("Comment", back_populates='user')
+    comments = orm.relationship("Comment")
+    posts = orm.relationship('ForumPost')
 
     def __repr__(self):
         return f"<User> {self.id} {self.name} {self.email}"

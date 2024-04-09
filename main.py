@@ -5,6 +5,7 @@ from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user
 
 from data import db_session
+from TestAdd.addTestData import add_tests, add_test_users
 from forms.user import RegisterForm, LoginForm
 from forms.test_form import TestForm
 
@@ -45,6 +46,7 @@ def reqister():
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = User(
+            is_admin=0,
             name=form.name.data,
             email=form.email.data,
             about=form.about.data
@@ -71,26 +73,27 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/test_run/<int:n>', methods=['GET', 'POST'])
-def test_run(n):
+@app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
+def test_run(i, n):
     if request.method == 'GET':
-        a = Test('test1.json')
-        res = a.run(n)
+        db_sess = db_session.create_session()
+       # print(db_sess.query(Test).filter(Test.id == 1).first())
+        cur_query = Test(i)
+        res = cur_query.run(n)
         if len(res) == 2:
             qst, ans = res
             form = TestForm()
             form.answers.label = qst
             form.answers.choices = [(i, ans[i]) for i in ans.keys()]
-            print(ans, 'asdfas')
             return render_template('test_run.html', form=form)
     elif request.method == 'POST':
         print(request.form.get('answers'))
         return '' # сделать переход на следующую страницу
 
-
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
+  #  add_tests(db_sess)
     app.run(debug=True)
 
 

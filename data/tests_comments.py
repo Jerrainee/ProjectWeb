@@ -13,5 +13,5 @@ class Comment(SqlAlchemyBase):
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"), nullable=True)
     test_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("tests.id"))
     date_of_creation = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
-    author = orm.relationship('User')
-    test = orm.relationship('Test')
+    author = orm.relationship('User', overlaps="comments")
+    test = orm.relationship('Test', overlaps="comments")

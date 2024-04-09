@@ -1,18 +1,17 @@
 import json
 from forms.test_form import TestForm
-file = 'test1.json'
 
 
 class Test():
-    def __init__(self, file):
-        with open(f'json_files/{file}', encoding="utf-8") as json_file:
+    def __init__(self, i):
+        with open(f'json_files/{i}.json', encoding="utf-8") as json_file:
             f = json_file.read()
             self.data = json.loads(f)
             print(self.data)
 
     def run(self, n):
         if n == len(self.data):
-            pass  # тест пройден
+            return 1    # тест пройден
         else:
             question = self.data[n]['question']
             answers = self.data[n]['answers']
@@ -21,5 +20,5 @@ class Test():
             return question, answers
 
 
-test = Test(file)
+test = Test(0)
 test.run(0)

@@ -14,4 +14,4 @@ class Message(SqlAlchemyBase):
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("posts.id"))
     date_of_creation = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     author = orm.relationship('User')
-    post = orm.relationship('Post')
+    post = orm.relationship('ForumPost', overlaps="messages")
