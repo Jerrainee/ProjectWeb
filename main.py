@@ -80,7 +80,8 @@ def test_run(n):
             qst, ans = res
             form = TestForm()
             form.answers.label = qst
-            form.answers.choices = ans
+            form.answers.choices = [(i, ans[i]) for i in ans.keys()]
+            print(ans, 'asdfas')
             return render_template('test_run.html', form=form)
     elif request.method == 'POST':
         print(request.form.get('answers'))
