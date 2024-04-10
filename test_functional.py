@@ -15,7 +15,7 @@ class TestFunc():
         self.name = test[1]
         self.desc = test[2]
         self.data = [eval(i + '}') for i in (test[3])[1:-2].split('}, ')]
-        self.res = test[4]
+        self.res = eval(test[4])
 
     def run(self, n):
         if n == len(self.data):
@@ -27,6 +27,11 @@ class TestFunc():
             return question, answers
 
 
-#db_sess = db_session.create_session()
-#test = TestFunc(0, db_sess)
-#test.run(0)
+    def result(self, cur_res):
+        dct_data = {}
+        for i in cur_res:
+            dct_data[i] = cur_res.count(i)
+        dct_res = sorted(dct_data.items(), key=lambda x: x[1], reverse=True)
+        return self.res[dct_res[0][0]]
+
+

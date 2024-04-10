@@ -20,7 +20,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
+cur_res = []
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -76,11 +76,22 @@ def login():
 
 @app.route('/test/<int:i>', methods=['GET', 'POST'])
 def page(i):
-    pass
+    pass # страница - превью теста
+
+@app.route('/test/<int:i>/result', methods=['GET', 'POST'])
+def result_page(i):
+    global cur_res
+    db_sess = db_session.create_session()
+    cur_test = db_sess.query(Test).filter(Test.id == i).first()
+    res = TestFunc(cur_test).result(cur_res)
+    cur_res = []
+
+    return render_template('test_result.html', res=res)
 
 
 @app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
 def test_run(i, n):
+    global cur_res
     if request.method == 'GET':
         db_sess = db_session.create_session()
         cur_test = db_sess.query(Test).filter(Test.id == i).first()
@@ -93,16 +104,17 @@ def test_run(i, n):
             form.answers.choices = [(i, ans[i]) for i in ans.keys()]
             return render_template('test_run.html', form=form)
         elif res == '1':
-            return redirect(f'/test/result')
+            return redirect(f'/test/{i}/result')
     elif request.method == 'POST':
-        print(request.form.get('answers'))
+        cur_res.append(int(request.form.get('answers')))
+        print(cur_res)
         return redirect(f'/test/{i}/{n + 1}')
 
 
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    #  add_tests(db_sess)
+  #  add_tests(db_sess)
     app.run(debug=True)
 
 
