@@ -21,6 +21,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 cur_res = []
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -32,6 +34,12 @@ def load_user(user_id):
 def home():
     return render_template('main.html')
 
+
+@app.route('/account/<int:i>', methods=['GET', 'POST'])
+def account(i):
+    db_sess = db_session.create_session()
+    cur_user = db_sess.query(User).filter(User.id == i).first()
+    return render_template('account.html', user=cur_user)  # нужно доделать форму html
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -76,7 +84,10 @@ def login():
 
 @app.route('/test/<int:i>', methods=['GET', 'POST'])
 def page(i):
-    pass # страница - превью теста
+    db_sess = db_session.create_session()
+    cur_test = db_sess.query(Test).filter(Test.id == i).first()
+    return render_template('test_preview.html', test=cur_test)
+
 
 @app.route('/test/<int:i>/result', methods=['GET', 'POST'])
 def result_page(i):
@@ -114,7 +125,7 @@ def test_run(i, n):
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-  #  add_tests(db_sess)
+    # add_tests(db_sess)
     app.run(debug=True)
 
 

@@ -2,8 +2,21 @@
 
 {% block content %}
 <h>Информация о тесте</h>
-<h1>{ test_name }</h1>
-<div class="container">
-    <div class="text">{ test_description }</div>
-  </div>
+<div class="">
+    <h1>{{ test.name }}</h1>
+    <div class="container">
+        <div class="text">{{ test.description }}</div>
+      </div>
+    <button onclick="location.href='/test/{{ test.id }}/0'" class="btn btn-dark">Пройти тест</button>
+</div>
+<h2> Комментрарии</h2>
+<button onclick="location.href='/forum/write_comment/{{test.id}}'" class="btn btn-secondary">Оставить комментарий</button>
+{% for comment in test.comments %}
+    <div class="list-group">
+        <p class="text-body-secondary"><a href="/account/{{comment.author.id}}">{{comment.author.name}}</a>
+                        {{comment.date_of_creation}}</small></p>
+        <p class="list-group-item">{{comment.data}}</p>
+    </div>
+{% endfor %}
+{% endblock %}
 
