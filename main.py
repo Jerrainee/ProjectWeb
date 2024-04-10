@@ -9,8 +9,9 @@ from TestAdd.addTestData import add_tests, add_test_users
 from forms.user import RegisterForm, LoginForm
 from forms.test_form import TestForm
 
-from test_functional import Test
+from test_functional import TestFunc
 from data.users import User
+from data.tests import Test
 from UserLogin import UserLogin
 
 app = Flask(__name__)
@@ -73,12 +74,17 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+@app.route('/test/<int:i>', methods=['GET', 'POST'])
+def page(i):
+    pass
+
+
 @app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
 def test_run(i, n):
     if request.method == 'GET':
         db_sess = db_session.create_session()
-       # print(db_sess.query(Test).filter(Test.id == 1).first())
-        cur_query = Test(i)
+        cur_test = db_sess.query(Test).filter(Test.id == i).first()
+        cur_query = TestFunc(cur_test)
         res = cur_query.run(n)
         if len(res) == 2:
             qst, ans = res
@@ -86,14 +92,17 @@ def test_run(i, n):
             form.answers.label = qst
             form.answers.choices = [(i, ans[i]) for i in ans.keys()]
             return render_template('test_run.html', form=form)
+        elif res == '1':
+            return redirect(f'/test/result')
     elif request.method == 'POST':
         print(request.form.get('answers'))
-        return '' # сделать переход на следующую страницу
+        return redirect(f'/test/{i}/{n + 1}')
+
 
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-  #  add_tests(db_sess)
+    #  add_tests(db_sess)
     app.run(debug=True)
 
 

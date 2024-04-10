@@ -1,24 +1,32 @@
 import json
+
+from data import db_session
+from data.tests import Test
+from flask import redirect
+
 from forms.test_form import TestForm
 
 
-class Test():
-    def __init__(self, i):
-        with open(f'json_files/{i}.json', encoding="utf-8") as json_file:
-            f = json_file.read()
-            self.data = json.loads(f)
-            print(self.data)
+class TestFunc():
+    def __init__(self, test):
+        test = str(test).split(';;')
+        print(test[3])
+        self.id = test[0]
+        self.name = test[1]
+        self.desc = test[2]
+        self.data = [eval(i + '}') for i in (test[3])[1:-2].split('}, ')]
+        self.res = test[4]
 
     def run(self, n):
         if n == len(self.data):
-            return 1    # тест пройден
+            return '1'
         else:
             question = self.data[n]['question']
             answers = self.data[n]['answers']
-            print([(i, i) for i in answers.keys()])
 
             return question, answers
 
 
-test = Test(0)
-test.run(0)
+#db_sess = db_session.create_session()
+#test = TestFunc(0, db_sess)
+#test.run(0)

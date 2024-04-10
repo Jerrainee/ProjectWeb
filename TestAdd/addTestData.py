@@ -11,7 +11,7 @@ from data.users import User
 
 
 def add_tests(db_sess):
-    with open('json_files/0.json', encoding='utf-8') as file:
+    with open('json_files/1.json', encoding='utf-8') as file:
         data = json.loads(file.read())
 
     test = Test()

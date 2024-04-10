@@ -14,3 +14,6 @@ class Test(SqlAlchemyBase):
     data = sqlalchemy.Column(sqlalchemy.JSON, nullable=False)
     results = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     comments = orm.relationship('Comment')
+
+    def __repr__(self):
+        return f'{self.id};;{self.name};;{self.description};;{self.data};;{self.results}'
