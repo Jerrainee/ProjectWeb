@@ -1,7 +1,7 @@
 import datetime
 
 import wtforms
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, flash
 from flask_login import LoginManager, login_user, current_user
 
 from data import db_session
@@ -128,10 +128,14 @@ def test_run(i, n):
 
 @app.route('/write_comment/<int:i>', methods=['GET', 'POST'])
 def write_comment(i):
-    if request.method == 'GET':
+    form = CommentForm()
+    if request.method == "POST":
         if current_user.is_authenticated:
-            form = CommentForm()
             db_sess = db_session.create_session()
+            if len(form.content.data) < 1:
+                return render_template('write_comment.html',
+                                       form=form,
+                                       message="Заполните поле")
             comment = Comment(
                 content=form.content.data,
                 author_id=current_user.id,
@@ -140,7 +144,10 @@ def write_comment(i):
             )
             db_sess.add(comment)
             db_sess.commit()
-            render_template('write_comment.html', form=form)
+        else:
+            flash("Пожалуйста, войдите в аккаунт", "error")
+        return redirect(f'/test/{i}')
+    return render_template('write_comment.html', form=form)
 
 
 def main():
