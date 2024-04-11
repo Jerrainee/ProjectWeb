@@ -12,7 +12,10 @@
 	</head>
 	<body>
 		<h3>Сайт с тестами</h3>
-		<p><a href="/profile">Личный кабинет</a></p>
+		<p><a href="/account">Личный кабинет</a></p>
+		{% if current_user.is_authenticated %}
+        <a class="navbar-brand">{{ current_user.name }}</a>
+        {% endif %}
         <ul class="no-bullet">
 			<li><a href="/">Главная</a></li>
 			<li><a href="/news">Новости</a></li>

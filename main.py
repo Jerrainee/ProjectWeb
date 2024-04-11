@@ -38,6 +38,15 @@ def home():
     return render_template('main.html')
 
 
+@app.route('/account', methods=['GET', 'POST'])
+def profile():
+    if current_user.is_authenticated:
+        db_sess = db_session.create_session()
+        cur_user = db_sess.query(User).get(current_user.get_id())
+        return render_template('account.html', user=cur_user)
+    return redirect('/login')
+
+
 @app.route('/account/<int:i>', methods=['GET', 'POST'])
 def account(i):
     db_sess = db_session.create_session()
@@ -132,10 +141,6 @@ def write_comment(i):
     if request.method == "POST":
         if current_user.is_authenticated:
             db_sess = db_session.create_session()
-            if len(form.content.data) < 1:
-                return render_template('write_comment.html',
-                                       form=form,
-                                       message="Заполните поле")
             comment = Comment(
                 content=form.content.data,
                 author_id=current_user.id,
@@ -148,6 +153,17 @@ def write_comment(i):
             flash("Пожалуйста, войдите в аккаунт", "error")
         return redirect(f'/test/{i}')
     return render_template('write_comment.html', form=form)
+
+
+@app.route('/comment_delete/<int:i>', methods=['GET', 'POST'])
+def delete_comment(i):
+    db_sess = db_session.create_session()
+    cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
+    cur_test = cur_comm.test.id
+    if cur_comm:
+        db_sess.delete(cur_comm)
+        db_sess.commit()
+    return redirect(f'/test/{cur_test}')
 
 
 def main():
