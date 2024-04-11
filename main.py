@@ -2,16 +2,19 @@ import datetime
 
 import wtforms
 from flask import Flask, render_template, redirect, request
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, current_user
 
 from data import db_session
 from TestAdd.addTestData import add_tests, add_test_users
+from data.tests_comments import Comment
 from forms.user import RegisterForm, LoginForm
 from forms.test_form import TestForm
+from forms.comment import CommentForm
 
 from test_functional import TestFunc
 from data.users import User
 from data.tests import Test
+from data.forum_messages import Message
 from UserLogin import UserLogin
 
 app = Flask(__name__)
@@ -40,6 +43,7 @@ def account(i):
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
     return render_template('account.html', user=cur_user)  # нужно доделать форму html
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -120,6 +124,23 @@ def test_run(i, n):
         cur_res.append(int(request.form.get('answers')))
         print(cur_res)
         return redirect(f'/test/{i}/{n + 1}')
+
+
+@app.route('/write_comment/<int:i>', methods=['GET', 'POST'])
+def write_comment(i):
+    if request.method == 'GET':
+        if current_user.is_authenticated:
+            form = CommentForm()
+            db_sess = db_session.create_session()
+            comment = Comment(
+                content=form.content.data,
+                author_id=current_user.id,
+                test_id=i,
+                date_of_creation=datetime.datetime.now()
+            )
+            db_sess.add(comment)
+            db_sess.commit()
+            render_template('write_comment.html', form=form)
 
 
 def main():
