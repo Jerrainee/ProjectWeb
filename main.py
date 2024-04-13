@@ -43,15 +43,21 @@ def profile():
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         cur_user = db_sess.query(User).get(current_user.get_id())
-        return render_template('account.html', user=cur_user)
+        dct = {}
+        if cur_user.test_results:
+            dct = eval(cur_user.test_results)
+        return render_template('account.html', user=cur_user, dct=dct)
     return redirect('/login')
 
 
 @app.route('/account/<int:i>', methods=['GET', 'POST'])
 def account(i):
+    dct = {}
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
-    return render_template('account.html', user=cur_user)  # нужно доделать форму html
+    if cur_user.test_results:
+        dct = eval(cur_user.test_results)
+    return render_template('account.html', user=cur_user, dct=dct)
 
 
 @app.route('/change_profile', methods=['GET', 'POST'])

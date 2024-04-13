@@ -12,5 +12,7 @@
     {% endif %}
     <h>Результаты тестов:</h>
 </div>
-
+{% for i in dct.keys() %}
+    <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }}</p>
+{% endfor %}
 {% endblock %}
