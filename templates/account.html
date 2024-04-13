@@ -6,6 +6,11 @@
     <h3>{{ user.name }}</h3>
     <h>Описание</h>:
     <p class="container"> {{ user.about }}</p>
+    {% if current_user == user %}
+        <p><a href="/change_profile" class="btn btn-secondary">Настроить профиль</a>
+        <a href="/logout" class="btn btn-secondary">Выйти</a></p>
+    {% endif %}
+    <h>Результаты тестов:</h>
 </div>
 
 {% endblock %}
