@@ -43,3 +43,9 @@ li {
     font-size: 2em;
     z-index: 1;
   }
+
+body {
+  padding: 0;
+  margin: 0;
+  padding-top: 58px;
+}

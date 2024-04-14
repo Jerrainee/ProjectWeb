@@ -11,7 +11,7 @@
 		<title>Сайт с тестами</title>
 		<link rel="icon" href="" type="image/svg">
 	</head>
-	<body>
+	<header id="header">
 	<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
 		<div class="container-fluid">
 		<a class="navbar-brand h1" href="/">Сайт с тестами</a>
@@ -43,19 +43,16 @@
   		  </form>
 		</div>
 	</nav>
+	</header>
 
 		{% if current_user.is_authenticated %}
         <a class="navbar-brand">{{ current_user.name }}</a>
         {% endif %}
-        <ul class="no-bullet">
-			<li><a href="/news">Новости</a></li>
-			<li><a href="/forum">Форум</a></li>
-			<li><a href='/support'>Support</a></li>
-		</ul>
-	</body>
+	<body>
 	<main role="main" class="container">
 		{% block content %}
 
         {% endblock %}
 	</main>
+	</body>
 </html>
