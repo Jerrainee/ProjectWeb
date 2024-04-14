@@ -35,7 +35,11 @@ def load_user(user_id):
 @app.route('/', methods=["POST", "GET"])
 @app.route('/home', methods=["POST", "GET"])
 def home():
-    return render_template('main.html')
+    if request.method == 'GET':
+        return render_template('main.html')
+    else:
+        print(request.form.get('search'))
+        return ''
 
 
 @app.route('/account', methods=['GET', 'POST'])
