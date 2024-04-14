@@ -2,12 +2,12 @@ import datetime
 
 import wtforms
 from flask import Flask, render_template, redirect, request, flash
-from flask_login import LoginManager, login_user, current_user
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from data import db_session
 from TestAdd.addTestData import add_tests, add_test_users
 from data.tests_comments import Comment
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, ProfileForm
 from forms.test_form import TestForm
 from forms.comment import CommentForm
 
@@ -47,15 +47,44 @@ def profile():
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         cur_user = db_sess.query(User).get(current_user.get_id())
-        return render_template('account.html', user=cur_user)
+        dct = {}
+        if cur_user.test_results:
+            dct = eval(cur_user.test_results)
+        return render_template('account.html', user=cur_user, dct=dct)
     return redirect('/login')
 
 
 @app.route('/account/<int:i>', methods=['GET', 'POST'])
 def account(i):
+    dct = {}
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
-    return render_template('account.html', user=cur_user)  # нужно доделать форму html
+    if cur_user.test_results:
+        dct = eval(cur_user.test_results)
+    return render_template('account.html', user=cur_user, dct=dct)
+
+
+@app.route('/change_profile', methods=['GET', 'POST'])
+def change_profile():
+    if current_user.is_authenticated:
+        form, message = ProfileForm(), ''
+        db_sess = db_session.create_session()
+        cur_user = db_sess.query(User).get(current_user.get_id())
+        if request.method == 'GET':
+            form.name.data = cur_user.name
+            form.about.data = cur_user.about
+
+        elif request.method == 'POST':
+            check = db_sess.query(User).filter(User.name == form.name.data).first()
+            if not check or check == cur_user:
+                cur_user.name = form.name.data
+                cur_user.about = form.about.data
+                db_sess.commit()
+                return redirect('/account')
+            else:
+                print(111111111111111111111111)
+                message = 'Пользователь с таким ником уже существует!'
+        return render_template('change_profile.html', form=form, message=message)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -99,6 +128,13 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
 @app.route('/test/<int:i>', methods=['GET', 'POST'])
 def page(i):
     db_sess = db_session.create_session()
@@ -112,9 +148,17 @@ def result_page(i):
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
     res = TestFunc(cur_test).result(cur_res)
+    if current_user.is_authenticated:
+        cur_user = db_sess.query(User).get(current_user.get_id())
+        if not cur_user.test_results:
+            cur_user.test_results = '{}'
+        dct = eval(cur_user.test_results)
+        dct[i] = res
+        cur_user.test_results = str(dct)
+        db_sess.commit()
     cur_res = []
 
-    return render_template('test_result.html', res=res)
+    return render_template('test_result.html', res=res, test=cur_test)
 
 
 @app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
@@ -135,7 +179,6 @@ def test_run(i, n):
             return redirect(f'/test/{i}/result')
     elif request.method == 'POST':
         cur_res.append(int(request.form.get('answers')))
-        print(cur_res)
         return redirect(f'/test/{i}/{n + 1}')
 
 
@@ -173,7 +216,7 @@ def delete_comment(i):
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    # add_tests(db_sess)
+    add_tests(db_sess)
     app.run(debug=True)
 
 

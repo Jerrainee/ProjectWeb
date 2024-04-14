@@ -9,7 +9,7 @@
       </div>
     <button onclick="location.href='/test/{{ test.id }}/0'" class="btn btn-dark">Пройти тест</button>
 </div>
-<h2> Комментрарии</h2>
+<h2>Комментрарии</h2>
 <button onclick="location.href='/write_comment/{{test.id}}'" class="btn btn-secondary">Оставить комментарий</button>
 {% for comment in test.comments %}
     <div class="list-group">
