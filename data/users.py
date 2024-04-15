@@ -23,6 +23,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     comments = orm.relationship("Comment")
     posts = orm.relationship('ForumPost')
 
+
     def __repr__(self):
         return f"<User> {self.id} {self.name} {self.email}"
 

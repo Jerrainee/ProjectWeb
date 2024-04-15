@@ -3,11 +3,12 @@
 {% block content %}
 <div class="">
     <h1>Просмотр профиля</h1>
-    {% if user.IsAdmin == 1 %} <!--проверка на владение правами администратора. если они есть - отображать ссылку на борду администратора -->
-    <h5>Администратор сайта.</h5>
-    <p><a href="/admin">Перейти в панель администратора.</a></p>
+    {% if user.is_admin == 1 %}
+        <h5>Администратор сайта.</h5>
+        {% if user.is_admin == 1 and current_user == user%}
+            <p><a href="/admin">Перейти в панель администратора.</a></p>
+        {% endif %}
     {% endif %}
-    <p><a href="/logout">Выйти из профиля</a>
     <h3>{{ user.name }}</h3>
     <h>Описание</h>:
     <p class="container"> {{ user.about }}</p>
@@ -18,6 +19,6 @@
     <h>Результаты тестов:</h>
 </div>
 {% for i in dct.keys() %}
-    <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }}</p>
+    <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p>
 {% endfor %}
 {% endblock %}

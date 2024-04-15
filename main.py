@@ -6,6 +6,8 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 
 from data import db_session
 from TestAdd.addTestData import add_tests, add_test_users
+from data.forum_posts import ForumPost
+from data.news import News
 from data.tests_comments import Comment
 from forms.user import RegisterForm, LoginForm, ProfileForm
 from forms.test_form import TestForm
@@ -82,7 +84,6 @@ def change_profile():
                 db_sess.commit()
                 return redirect('/account')
             else:
-                print(111111111111111111111111)
                 message = 'Пользователь с таким ником уже существует!'
         return render_template('change_profile.html', form=form, message=message)
 
@@ -223,68 +224,54 @@ def delete_comment(i):
 @app.route('/admin/')
 @login_required
 def admin():
-    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу
-    '''
-    user = dbase.getUser(current_user.id)
-    if user['IsAdmin'] != 1:
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.get_id())
+    if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
-        return redirect(url_for('main'))
+        return redirect('/')
     else:
-    '''
-    return render_template('admin.html')
+        return render_template('admin.html')
 
 @app.route('/admin/messages/')
 @login_required
 def admin_messages():
-    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу， нужен функционал отображения обращений
-    '''
-    user = dbase.getUser(current_user.id)
-    if user['IsAdmin'] != 1:
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.get_id())
+    if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
-        return redirect(url_for('main'))
+        return redirect('/')
     else:
-    '''
-    return render_template('messages.html')
+        return render_template('messages.html')
 
 @app.route('/admin/post_news', methods = ['POST', 'GET'])
 def admin_post_news():
     # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
-    # ДОБАВЬТЕ ТАБЛИЦУ С НОВОСТЯМИ
-    '''
-    db = get_db()
-    dbase = FDataBase.FDataBase(db)
-    user = dbase.getUser(current_user.id)
-    if user['IsAdmin'] != 1:
+
+
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.get_id())
+    if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
-        return redirect(url_for('main'))
+        return redirect('/')
     else:
         if request.method == "POST":
-            img = request.files['image']
-            res = dbase.addNews(request.form['title'], request.form['txt'], img)
-            flash('Новость успешно добавлена', category="success")
-    '''
+           pass # нужна форма создания новости, html перепиши !
     return render_template('admin_post_news.html')
 
 @app.route('/news')
 def showNews():
-    # Необходимо реализовать функционал отображения новостей через sqlalchemy
-    '''
-    db = get_db()
-    dbase = FDataBase.FDataBase(db)
-    based = dbase.getNews()
-    '''
-    return render_template('news.html')
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).all()
+    return render_template('news.html', news=news)
 
 @app.route('/forum')
 def showForum():
-    # Необходимо реализовать функционал отображения форума через sqlalchemy
-    # ДОБАВЬТЕ ТАБЛИЦУ С ВЕТКАМИ ФОРУМА
-    '''
-    db = get_db()
-    dbase = FDataBase.FDataBase(db)
-    based = dbase.getNews()
-    '''
-    return render_template('forum.html')
+    # необходимо сделать переход к посту, чтоб там были комменты
+
+    db_sess = db_session.create_session()
+    posts = db_sess.query(ForumPost).all()
+
+    return render_template('forum.html', posts=posts)
 
 @app.route('/support', methods = ["POST", "GET"])
 def support():

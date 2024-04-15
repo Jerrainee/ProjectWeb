@@ -3,10 +3,10 @@
 {% block content %}
 {{ super() }}
 {% if branches|length != 0 %}
-{% for branch in branches[::-1] %}
-<!-- Добавить отображение веток форума, пример указан ниже -->
+{% for branch in posts[::-1] %}
 <h4>{{branch.title}}</h4>
-<p>{{branch.txt}}</p>
+<p>{{branch.content}}</p>
+<p class="card-text"><small class="text-body-secondary"><a href="/account/{{branch.author_id}}">{{branch.author.username}}</a> {{branch.created_date}}</small></p>
 <p>--------------------</p>
 {% endfor %}
 {% else %}

@@ -4,10 +4,8 @@
 {{ super() }}
 {% if news|length != 0 %}
 {% for new in news[::-1] %}
-<!-- Добавить отображение новостей, пример указан ниже -->
 <h4>{{new.title}}</h4>
-{{ new.img|safe }}
-<p>{{new.txt}}</p>
+<p>{{new.content}}</p>
 <p>--------------------</p>
 {% endfor %}
 {% else %}
