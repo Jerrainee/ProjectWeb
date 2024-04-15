@@ -134,6 +134,14 @@ def logout():
     logout_user()
     return redirect("/")
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(401)
+def not_authorized(e):
+    return render_template('401.html'), 401
+
 
 @app.route('/test/<int:i>', methods=['GET', 'POST'])
 def page(i):
@@ -212,6 +220,88 @@ def delete_comment(i):
         db_sess.commit()
     return redirect(f'/test/{cur_test}')
 
+@app.route('/admin/')
+@login_required
+def admin():
+    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу
+    '''
+    user = dbase.getUser(current_user.id)
+    if user['IsAdmin'] != 1:
+        flash('У вас нет доступа к этой странице!', 'error')
+        return redirect(url_for('main'))
+    else:
+    '''
+    return render_template('admin.html')
+
+@app.route('/admin/messages/')
+@login_required
+def admin_messages():
+    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу， нужен функционал отображения обращений
+    '''
+    user = dbase.getUser(current_user.id)
+    if user['IsAdmin'] != 1:
+        flash('У вас нет доступа к этой странице!', 'error')
+        return redirect(url_for('main'))
+    else:
+    '''
+    return render_template('messages.html')
+
+@app.route('/admin/post_news', methods = ['POST', 'GET'])
+def admin_post_news():
+    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
+    # ДОБАВЬТЕ ТАБЛИЦУ С НОВОСТЯМИ
+    '''
+    db = get_db()
+    dbase = FDataBase.FDataBase(db)
+    user = dbase.getUser(current_user.id)
+    if user['IsAdmin'] != 1:
+        flash('У вас нет доступа к этой странице!', 'error')
+        return redirect(url_for('main'))
+    else:
+        if request.method == "POST":
+            img = request.files['image']
+            res = dbase.addNews(request.form['title'], request.form['txt'], img)
+            flash('Новость успешно добавлена', category="success")
+    '''
+    return render_template('admin_post_news.html')
+
+@app.route('/news')
+def showNews():
+    # Необходимо реализовать функционал отображения новостей через sqlalchemy
+    '''
+    db = get_db()
+    dbase = FDataBase.FDataBase(db)
+    based = dbase.getNews()
+    '''
+    return render_template('news.html')
+
+@app.route('/forum')
+def showForum():
+    # Необходимо реализовать функционал отображения форума через sqlalchemy
+    # ДОБАВЬТЕ ТАБЛИЦУ С ВЕТКАМИ ФОРУМА
+    '''
+    db = get_db()
+    dbase = FDataBase.FDataBase(db)
+    based = dbase.getNews()
+    '''
+    return render_template('forum.html')
+
+@app.route('/support', methods = ["POST", "GET"])
+def support():
+    # Необходимо реализовать функционал добавления и отправки сообщения через sqlalchemy
+    # ДОБАВЬТЕ ТАБЛИЦУ С ОБРАЩЕНИЯМИ
+    '''
+    if request.method == "POST":
+        # code here
+
+        # --- --- ---
+        res = # вызов булевой функции, подтверждающей отправление сообщения
+        if res:
+            flash('Сообщение успешно отправлено!', category="success")
+        else:
+            flash('Не удалось отправить сообщение!','error')
+    '''
+    return render_template("support.html")
 
 def main():
     db_session.global_init("db/site_DB.db")
