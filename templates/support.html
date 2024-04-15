@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+{{ super() }}
+<h3>Обращение в Администрацию сайта</h3>
+<h5>Не забудьте упомянуть контактную информацию в тексте сообщения!</h5>
+<form action="/support" method="post" class="support" enctype="multipart/form-data">
+    <p><label>Контактный email: </label> <input type="email" name="email" value="" required />
+    <p><label>Имя и фамилия (через пробел): </label> <input type="text" name="name" value="" required />
+    <p><label>Сообщение: </label> 
+    <p><textarea name="msg" value="" required ></textarea>
+    <p><input type="submit" value="Отправить" />
+</form>
+{% endblock %}

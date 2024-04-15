@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{% if news|length != 0 %}
+{% for new in news[::-1] %}
+<!-- Добавить отображение новостей, пример указан ниже -->
+<h4>{{new.title}}</h4>
+{{ new.img|safe }}
+<p>{{new.txt}}</p>
+<p>--------------------</p>
+{% endfor %}
+{% else %}
+<h4>Новостей пока нет!</h4>
+{% endif %}
+{% endblock %}

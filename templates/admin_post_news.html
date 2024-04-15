@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<p><a href="/admin">Вернуться на страницу панели администратора.</a></p>
+<form action="{{url_for('admin_post_news')}}" method = "post" class="form-contact" enctype="multipart/form-data">
+    <p><label>Название новости:</label> <input type="text", name="title", value="", required/></p>
+    <p><label>Текст новости:</label></p>
+    <p><textarea name="txt", rows="7", cols="40" required></textarea></p>
+    <p><label>Картинка новости: </label><input type="file", name="image"/>
+    <p><input type="submit" value="Добавить"/>
+</form>
+{% endblock %}

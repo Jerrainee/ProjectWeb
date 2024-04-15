@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{% if branches|length != 0 %}
+{% for branch in branches[::-1] %}
+<!-- Добавить отображение веток форума, пример указан ниже -->
+<h4>{{branch.title}}</h4>
+<p>{{branch.txt}}</p>
+<p>--------------------</p>
+{% endfor %}
+{% else %}
+<h4>Веток форума пока нет!</h4>
+{% endif %}
+{% endblock %}
