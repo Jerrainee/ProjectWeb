@@ -1,7 +1,7 @@
 import datetime
 
 import wtforms
-from flask import Flask, render_template, redirect, request, flash
+from flask import Flask, render_template, redirect, request, flash, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from data import db_session
@@ -49,7 +49,7 @@ def home():
         return render_template('search.html', tests=results, request=request.form.get('search'))
 
 
-@app.route('/account', methods=['GET', 'POST'])
+@app.route('/account')
 def profile():
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
@@ -61,36 +61,38 @@ def profile():
     return redirect('/login')
 
 
-@app.route('/account/<int:i>', methods=['GET', 'POST'])
+@app.route('/account/<int:i>')
 def account(i):
     dct = {}
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
+    if not cur_user:
+        return abort(404)
     if cur_user.test_results:
         dct = eval(cur_user.test_results)
     return render_template('account.html', user=cur_user, dct=dct)
 
 
 @app.route('/change_profile', methods=['GET', 'POST'])
+@login_required
 def change_profile():
-    if current_user.is_authenticated:
-        form, message = ProfileForm(), ''
-        db_sess = db_session.create_session()
-        cur_user = db_sess.query(User).get(current_user.get_id())
-        if request.method == 'GET':
-            form.name.data = cur_user.name
-            form.about.data = cur_user.about
+    form, message = ProfileForm(), ''
+    db_sess = db_session.create_session()
+    cur_user = db_sess.query(User).get(current_user.get_id())
+    if request.method == 'GET':
+        form.name.data = cur_user.name
+        form.about.data = cur_user.about
 
-        elif request.method == 'POST':
-            check = db_sess.query(User).filter(User.name == form.name.data).first()
-            if not check or check == cur_user:
-                cur_user.name = form.name.data
-                cur_user.about = form.about.data
-                db_sess.commit()
-                return redirect('/account')
-            else:
-                message = 'Пользователь с таким ником уже существует!'
-        return render_template('change_profile.html', form=form, message=message)
+    elif request.method == 'POST':
+        check = db_sess.query(User).filter(User.name == form.name.data).first()
+        if not check or check == cur_user:
+            cur_user.name = form.name.data
+            cur_user.about = form.about.data
+            db_sess.commit()
+            return redirect('/account')
+        else:
+            message = 'Пользователь с таким ником уже существует!'
+    return render_template('change_profile.html', form=form, message=message)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -140,27 +142,38 @@ def logout():
     logout_user()
     return redirect("/")
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
 
 @app.errorhandler(401)
 def not_authorized(e):
     return render_template('401.html'), 401
 
 
-@app.route('/test/<int:i>', methods=['GET', 'POST'])
+@app.errorhandler(400)
+def bad_request(_):
+    return render_template('400.html'), 400
+
+
+@app.route('/test/<int:i>')
 def page(i):
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
+    if not cur_test:
+        return abort(404)
     return render_template('test_preview.html', test=cur_test)
 
 
-@app.route('/test/<int:i>/result', methods=['GET', 'POST'])
+@app.route('/test/<int:i>/result')
 def result_page(i):
     global cur_res
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
+    if not cur_test or not cur_res:
+        return abort(400)
     res = TestFunc(cur_test).result(cur_res)
     if current_user.is_authenticated:
         cur_user = db_sess.query(User).get(current_user.get_id())
@@ -181,6 +194,8 @@ def test_run(i, n):
     if request.method == 'GET':
         db_sess = db_session.create_session()
         cur_test = db_sess.query(Test).filter(Test.id == i).first()
+        if not cur_test:
+            return abort(404)
         cur_query = TestFunc(cur_test)
         res = cur_query.run(n)
         if len(res) == 2:
@@ -192,6 +207,9 @@ def test_run(i, n):
         elif res == '1':
             return redirect(f'/test/{i}/result')
     elif request.method == 'POST':
+        if not request.form.get('answers'):
+            flash('Пожалуйста, выберите вариант ответа!', 'error')
+            return redirect(f'/test/{i}/{n}')
         cur_res.append(int(request.form.get('answers')))
         return redirect(f'/test/{i}/{n + 1}')
 
@@ -211,20 +229,23 @@ def write_comment(i):
             db_sess.add(comment)
             db_sess.commit()
         else:
-            flash("Пожалуйста, войдите в аккаунт", "error")
+            return abort(401)
         return redirect(f'/test/{i}')
     return render_template('write_comment.html', form=form)
 
 
-@app.route('/comment_delete/<int:i>', methods=['GET', 'POST'])
+@app.route('/comment_delete/<int:i>')
 def delete_comment(i):
     db_sess = db_session.create_session()
     cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
     cur_test = cur_comm.test.id
-    if cur_comm:
+    if cur_comm and current_user.get_id() == i:
         db_sess.delete(cur_comm)
         db_sess.commit()
+    else:
+        return abort(404)
     return redirect(f'/test/{cur_test}')
+
 
 @app.route('/admin/')
 @login_required
@@ -237,6 +258,7 @@ def admin():
     else:
         return render_template('admin.html')
 
+
 @app.route('/admin/messages/')
 @login_required
 def admin_messages():
@@ -248,10 +270,10 @@ def admin_messages():
     else:
         return render_template('messages.html')
 
-@app.route('/admin/post_news', methods = ['POST', 'GET'])
+
+@app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
     # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
-
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
@@ -260,14 +282,16 @@ def admin_post_news():
         return redirect('/')
     else:
         if request.method == "POST":
-           pass # нужна форма создания новости, html перепиши !
+            pass  # нужна форма создания новости, html перепиши !
     return render_template('admin_post_news.html')
+
 
 @app.route('/news')
 def showNews():
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()
     return render_template('news.html', news=news)
+
 
 @app.route('/forum')
 def showForum():
@@ -278,7 +302,8 @@ def showForum():
 
     return render_template('forum.html', posts=posts)
 
-@app.route('/support', methods = ["POST", "GET"])
+
+@app.route('/support', methods=["POST", "GET"])
 def support():
     # Необходимо реализовать функционал добавления и отправки сообщения через sqlalchemy
     # ДОБАВЬТЕ ТАБЛИЦУ С ОБРАЩЕНИЯМИ
@@ -294,6 +319,7 @@ def support():
             flash('Не удалось отправить сообщение!','error')
     '''
     return render_template("support.html")
+
 
 def main():
     db_session.global_init("db/site_DB.db")
