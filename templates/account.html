@@ -4,6 +4,7 @@
 <div class="">
     <h1>Просмотр профиля</h1>
     {% if user.is_admin == 1 %}
+        <br>
         <h5>Администратор сайта.</h5>
         {% if user.is_admin == 1 and current_user == user%}
             <p><a href="/admin">Перейти в панель администратора.</a></p>
@@ -16,6 +17,7 @@
         <p><a href="/change_profile" class="btn btn-secondary">Настроить профиль</a>
         <a href="/logout" class="btn btn-secondary">Выйти</a></p>
     {% endif %}
+    <br>
     <h>Результаты тестов:</h>
 </div>
 {% for i in dct.keys() %}
