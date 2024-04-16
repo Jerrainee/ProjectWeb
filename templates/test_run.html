@@ -7,7 +7,7 @@
     <p>{% for subfield in form.answers %}
     <tr>
         <td>{{ subfield }}</td>
-        <td>{{ subfield.label }}</td>
+        <td>{{ subfield.label }}</td><br>
     </tr>
     {% endfor %}</p>
     <p>{{form.submit(type="submit", class="btn btn-primary") }}</p>

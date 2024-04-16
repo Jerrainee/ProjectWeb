@@ -52,6 +52,9 @@
         <a class="navbar-brand">{{ current_user.name }}</a>
         {% endif %}
 	<body>
+	{% for cat, msg in get_flashed_messages(True) %}
+	    <div class="flash {{cat}}">{{msg}}</div>
+    {% endfor %}
 	<main role="main" class="container">
 		{% block content %}
 

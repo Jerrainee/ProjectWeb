@@ -18,9 +18,14 @@
         <a href="/logout" class="btn btn-secondary">Выйти</a></p>
     {% endif %}
     <br>
-    <h>Результаты тестов:</h>
+    <h5>Результаты тестов:</h5>
 </div>
-{% for i in dct.keys() %}
-    <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p>
-{% endfor %}
+{% if dct %}
+    {% for i in dct.keys() %}
+        <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p>
+    {% endfor %}
+{% else %}
+    <p>Здесь пока что пусто..</p>
+{% endif %}
+
 {% endblock %}

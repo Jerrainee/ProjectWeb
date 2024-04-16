@@ -2,7 +2,7 @@ import json
 
 from data import db_session
 from data.tests import Test
-from flask import redirect
+from flask import redirect, abort
 
 from forms.test_form import TestForm
 
@@ -20,6 +20,8 @@ class TestFunc():
     def run(self, n):
         if n == len(self.data):
             return '1'
+        elif n > len(self.data):
+            return abort(400)
         else:
             question = self.data[n]['question']
             answers = self.data[n]['answers']
