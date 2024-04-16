@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="text">Добро пожаловать на сайт с тестами!</div>
-<h3>Актуальные тесты</h3>
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<h3>Найденные тесты по запросу: "{{ request }}"</h3>
+
 <div class="row row-cols-md-3">
-{% for test in tests[-8:]%}
+{% for test in tests%}
 <div class="col mb-3">
 <div class="card" style="width: auto;">
   <div class="card-body">

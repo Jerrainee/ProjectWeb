@@ -11,8 +11,11 @@
 		<title>Сайт с тестами</title>
 		<link rel="icon" href="" type="image/svg">
 	</head>
-	<header id="header">
-	<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+	<body>
+	{% for cat, msg in get_flashed_messages(True) %}
+	<div class="flash {{cat}}">{{msg}}</div>
+	{% endfor %}
+	<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark" style="max_height: auto;">
 		<div class="container-fluid">
 		<a class="navbar-brand h1" href="/">Сайт с тестами</a>
 		<button class="navbar-toggler"
@@ -46,13 +49,10 @@
   		  </form>
 		</div>
 	</nav>
-	</header>
-
+	<main role="main" class="container-fluid" style="margin-top:80px">
 		{% if current_user.is_authenticated %}
         <a class="navbar-brand">{{ current_user.name }}</a>
         {% endif %}
-	<body>
-	<main role="main" class="container">
 		{% block content %}
 
         {% endblock %}

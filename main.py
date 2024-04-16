@@ -37,11 +37,16 @@ def load_user(user_id):
 @app.route('/', methods=["POST", "GET"])
 @app.route('/home', methods=["POST", "GET"])
 def home():
+    db_sess = db_session.create_session()
+    tests = db_sess.query(Test).all()
+    print(tests[-1].id)
     if request.method == 'GET':
-        return render_template('main.html')
+        return render_template('main.html', tests=tests)
     else:
-        print(request.form.get('search'))
-        return ''
+        results = [[i, len(set(request.form.get('search').lower().split()) & set(i.name.lower().split()))] for i in tests if set(request.form.get('search').lower().split()) & set(i.name.lower().split())]
+        results.sort(key=lambda x: x[1])
+        results = list(map(lambda x: x[0], results))
+        return render_template('search.html', tests=results, request=request.form.get('search'))
 
 
 @app.route('/account', methods=['GET', 'POST'])
