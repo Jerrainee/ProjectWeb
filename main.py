@@ -34,19 +34,26 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route('/', methods=["POST", "GET"])
-@app.route('/home', methods=["POST", "GET"])
+@app.route('/result')
+def result():
+    search_query = request.args.get('search')
+    db_sess = db_session.create_session()
+    tests = db_sess.query(Test).all()
+    results = [[i, len(set(search_query.lower().split()) & set(i.name.lower().split()))] for i in
+               tests if set(search_query.lower().split()) & set(i.name.lower().split())]
+    results.sort(key=lambda x: x[1])
+    results = list(map(lambda x: x[0], results))
+    print(results)
+    return render_template('search.html', tests=results, request=search_query)
+
+
+@app.route('/')
+@app.route('/home')
 def home():
     db_sess = db_session.create_session()
     tests = db_sess.query(Test).all()
     print(tests[-1].id)
-    if request.method == 'GET':
-        return render_template('main.html', tests=tests)
-    else:
-        results = [[i, len(set(request.form.get('search').lower().split()) & set(i.name.lower().split()))] for i in tests if set(request.form.get('search').lower().split()) & set(i.name.lower().split())]
-        results.sort(key=lambda x: x[1])
-        results = list(map(lambda x: x[0], results))
-        return render_template('search.html', tests=results, request=request.form.get('search'))
+    return render_template('main.html', tests=tests)
 
 
 @app.route('/account')
