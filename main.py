@@ -46,6 +46,8 @@ def result():
         for word in search_query:
             if word.lower() in cur_search and i not in res:
                 res.append(i)
+            elif word.lower() not in cur_search:
+                break
     res = [i for i in res[::-1]]
     if len(res) > 9:
         res = res[:9]
