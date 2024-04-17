@@ -3,6 +3,7 @@
 {% block content %}
 {{ super() }}
 <div class="text">Добро пожаловать на сайт с тестами!</div>
+<br>
 <h3>Актуальные тесты</h3>
 <div class="row row-cols-md-3">
 {% for test in tests[-9:]%}
