@@ -38,12 +38,7 @@ def load_user(user_id):
 def result():
     search_query = request.args.get('search')
     db_sess = db_session.create_session()
-    tests = db_sess.query(Test).all()
-    results = [[i, len(set(search_query.lower().split()) & set(i.name.lower().split()))] for i in
-               tests if set(search_query.lower().split()) & set(i.name.lower().split())]
-    results.sort(key=lambda x: x[1])
-    results = list(map(lambda x: x[0], results))
-    print(results)
+    results = db_sess.query(Test).filter(Test.name.like(f'%{search_query}%'))
     return render_template('search.html', tests=results, request=search_query)
 
 
@@ -331,7 +326,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    add_tests(db_sess)
+   # add_tests(db_sess)
     app.run(debug=True)
 
 
