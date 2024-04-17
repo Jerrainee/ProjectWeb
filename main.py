@@ -38,8 +38,12 @@ def load_user(user_id):
 def result():
     search_query = request.args.get('search')
     db_sess = db_session.create_session()
-    results = db_sess.query(Test).filter(Test.name.like(f'%{search_query}%'))
-    return render_template('search.html', tests=results, request=search_query)
+    cur_tests = db_sess.query(Test).filter(Test.name.like(f'%{search_query}%'))
+    res = [i for i in cur_tests[::-1]]
+    if len(res) > 9:
+        res = res[:9]
+
+    return render_template('search.html', tests=res, request=search_query)
 
 
 @app.route('/')
@@ -93,7 +97,7 @@ def change_profile():
             db_sess.commit()
             return redirect('/account')
         else:
-            message = 'Пользователь с таким ником уже существует!'
+            flash('Пользователь с таким ником уже существует!', 'error')
     return render_template('change_profile.html', form=form, message=message)
 
 
@@ -326,7 +330,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-   # add_tests(db_sess)
+    #add_tests(db_sess)
     app.run(debug=True)
 
 
