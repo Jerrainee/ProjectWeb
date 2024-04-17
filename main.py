@@ -1,5 +1,6 @@
 import datetime
 
+import requests
 import wtforms
 from flask import Flask, render_template, redirect, request, flash, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
@@ -39,14 +40,22 @@ def load_user(user_id):
 
 @app.route('/result')
 def result():
-    search_query = request.args.get('search')
+    search_query = request.args.get('search').split()
     db_sess = db_session.create_session()
-    cur_tests = db_sess.query(Test).filter(Test.name.like(f'%{search_query}%'))
-    res = [i for i in cur_tests[::-1]]
+    res = []
+    tests = db_sess.query(Test).all()
+    for i in tests:
+        cur_search = ' '.join([str(i).lower() for i in str(i).split(';;')[1].split()])
+        for word in search_query:
+            if word.lower() in cur_search and i not in res:
+                res.append(i)
+            elif word.lower() not in cur_search:
+                break
+    res = [i for i in res[::-1]]
     if len(res) > 9:
         res = res[:9]
 
-    return render_template('search.html', tests=res, request=search_query)
+    return render_template('search.html', tests=res, request=' '.join(search_query))
 
 
 @app.route('/')
@@ -117,11 +126,14 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
+        print(resp)
         user = User(
             is_admin=0,
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            about=form.about.data,
+            cat=resp
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -283,33 +295,32 @@ def admin_messages():
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
     # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
+
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
-    # if user.is_admin != 1:
-    #     flash('У вас нет доступа к этой странице!', 'error')
-    #     return redirect('/')
-    # else:
-    form = PostNewsForm()
-    if form.validate_on_submit():
-        news = News()
-        news.title = request.form.get('title')
-        news.content = request.form.get('txt')
-        news.author_id = user.id
-        news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
-        db_sess.add(news)
-        db_sess.commit()
-        print(news.id, 'sadasdasd')
-        print(db_sess.query(News).all())
-        return "Форма отправленна" # нужна форма создания новости, html перепиши !
-    return render_template('admin_post_news.html', form=form)
+    if user.is_admin != 1:
+        flash('У вас нет доступа к этой странице!', 'error')
+        return redirect('/')
+    else:
+        form = PostNewsForm()
+        if form.validate_on_submit():
+            news = News()
+            news.title = request.form.get('title')
+            news.content = request.form.get('txt')
+            news.author_id = user.id
+            news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+            db_sess.add(news)
+            db_sess.commit()
+            print(news.id, 'sadasdasd')
+            print(db_sess.query(News).all())
+            return "Форма отправленна"
+        return render_template('admin_post_news.html', form=form)
 
 
 @app.route('/news')
 def showNews():
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()
-    for i in news:
-        print(i.picture)
     return render_template('news.html', news=news)
 
 
