@@ -42,10 +42,10 @@ def result():
     res = []
     tests = db_sess.query(Test).all()
     for i in tests:
-        cur_search = str(i).split(';;')[1].split()
-        for test in tests:
-            if cur_search not in res:
-                res.append(test)
+        cur_search = ' '.join([str(i).lower() for i in str(i).split(';;')[1].split()])
+        for word in search_query:
+            if word.lower() in cur_search and i not in res:
+                res.append(i)
     res = [i for i in res[::-1]]
     if len(res) > 9:
         res = res[:9]
@@ -339,7 +339,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    # add_tests(db_sess)
+    #  add_tests(db_sess)
     app.run(debug=True)
 
 
