@@ -16,4 +16,5 @@ class News(SqlAlchemyBase):
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
+    picture = sqlalchemy.Column(sqlalchemy.TEXT, nullable=True)
     user = orm.relationship('User')

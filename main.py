@@ -12,12 +12,15 @@ from data.tests_comments import Comment
 from forms.user import RegisterForm, LoginForm, ProfileForm
 from forms.test_form import TestForm
 from forms.comment import CommentForm
+from forms.post_news_form import PostNewsForm
 
 from test_functional import TestFunc
 from data.users import User
 from data.tests import Test
 from data.forum_messages import Message
 from UserLogin import UserLogin
+
+import base64
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -280,22 +283,33 @@ def admin_messages():
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
     # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
-
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
-    if user.is_admin != 1:
-        flash('У вас нет доступа к этой странице!', 'error')
-        return redirect('/')
-    else:
-        if request.method == "POST":
-            pass  # нужна форма создания новости, html перепиши !
-    return render_template('admin_post_news.html')
+    # if user.is_admin != 1:
+    #     flash('У вас нет доступа к этой странице!', 'error')
+    #     return redirect('/')
+    # else:
+    form = PostNewsForm()
+    if form.validate_on_submit():
+        news = News()
+        news.title = request.form.get('title')
+        news.content = request.form.get('txt')
+        news.author_id = user.id
+        news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+        db_sess.add(news)
+        db_sess.commit()
+        print(news.id, 'sadasdasd')
+        print(db_sess.query(News).all())
+        return "Форма отправленна" # нужна форма создания новости, html перепиши !
+    return render_template('admin_post_news.html', form=form)
 
 
 @app.route('/news')
 def showNews():
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()
+    for i in news:
+        print(i.picture)
     return render_template('news.html', news=news)
 
 
@@ -330,7 +344,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    #add_tests(db_sess)
+    # add_tests(db_sess)
     app.run(debug=True)
 
 

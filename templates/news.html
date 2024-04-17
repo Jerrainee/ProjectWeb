@@ -6,6 +6,9 @@
 {% for new in news[::-1] %}
 <h4>{{new.title}}</h4>
 <p>{{new.content}}</p>
+<div class="col-md-4">
+    <img src="data:image/png;base64,{{ new.picture }}" class="img-fluid rounded-start">
+</div>
 <p>--------------------</p>
 {% endfor %}
 {% else %}
