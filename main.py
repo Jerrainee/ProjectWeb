@@ -10,6 +10,7 @@ from TestAdd.addTestData import add_tests, add_test_users
 from data.forum_posts import ForumPost
 from data.news import News
 from data.tests_comments import Comment
+from data.support import SupportMessage
 from forms.user import RegisterForm, LoginForm, ProfileForm
 from forms.test_form import TestForm
 from forms.comment import CommentForm
@@ -289,7 +290,8 @@ def admin_messages():
         flash('У вас нет доступа к этой странице!', 'error')
         return redirect('/')
     else:
-        return render_template('messages.html')
+        msgs = db_sess.query(SupportMessage).all()
+        return render_template('messages.html', msgs=msgs)
 
 
 @app.route('/admin/post_news', methods=['POST', 'GET'])
@@ -341,11 +343,19 @@ def showForum():
 def support():
     # Необходимо реализовать функционал добавления и отправки сообщения через sqlalchemy
     # ДОБАВЬТЕ ТАБЛИЦУ С ОБРАЩЕНИЯМИ
-    '''
     if request.method == "POST":
-        # code here
-
-        # --- --- ---
+        db_sess = db_session.create_session()
+        mes = SupportMessage()
+        mes.author_id = current_user.get_id()
+        mes.email = request.form.get('email')
+        mes.author_name = request.form.get('name')
+        mes.message = request.form.get('msg')
+        print(mes.email)
+        db_sess.add(mes)
+        db_sess.commit()
+        db_sess.flush()
+        flash('Сообщение успешно отправлено!', category="success")
+    '''
         res = # вызов булевой функции, подтверждающей отправление сообщения
         if res:
             flash('Сообщение успешно отправлено!', category="success")
