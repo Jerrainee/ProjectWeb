@@ -20,6 +20,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     test_results = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    cat = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     comments = orm.relationship("Comment")
     posts = orm.relationship('ForumPost')
 

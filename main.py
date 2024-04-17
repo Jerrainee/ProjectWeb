@@ -1,5 +1,6 @@
 import datetime
 
+import requests
 import wtforms
 from flask import Flask, render_template, redirect, request, flash, abort, make_response, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
@@ -36,14 +37,20 @@ def load_user(user_id):
 
 @app.route('/result')
 def result():
-    search_query = request.args.get('search')
+    search_query = request.args.get('search').split()
     db_sess = db_session.create_session()
-    cur_tests = db_sess.query(Test).filter(Test.name.like(f'%{search_query}%'))
-    res = [i for i in cur_tests[::-1]]
+    res = []
+    tests = db_sess.query(Test).all()
+    for i in tests:
+        cur_search = str(i).split(';;')[1].split()
+        for test in tests:
+            if cur_search not in res:
+                res.append(test)
+    res = [i for i in res[::-1]]
     if len(res) > 9:
         res = res[:9]
 
-    return render_template('search.html', tests=res, request=search_query)
+    return render_template('search.html', tests=res, request=' '.join(search_query))
 
 
 @app.route('/')
@@ -51,7 +58,6 @@ def result():
 def home():
     db_sess = db_session.create_session()
     tests = db_sess.query(Test).all()
-    print(tests[-1].id)
     return render_template('main.html', tests=tests)
 
 
@@ -114,11 +120,14 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
+        print(resp)
         user = User(
             is_admin=0,
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            about=form.about.data,
+            cat=resp
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -330,7 +339,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    #add_tests(db_sess)
+    # add_tests(db_sess)
     app.run(debug=True)
 
 
