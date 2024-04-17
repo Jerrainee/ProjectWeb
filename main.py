@@ -298,11 +298,12 @@ def admin_post_news():
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
-    if user.is_admin != 1:
-        flash('У вас нет доступа к этой странице!', 'error')
-        return redirect('/')
-    else:
-        form = PostNewsForm()
+    # if user.is_admin != 1:
+    #     flash('У вас нет доступа к этой странице!', 'error')
+    #     return redirect('/')
+    # else:
+    form = PostNewsForm()
+    if request.method == 'POST':
         if form.validate_on_submit():
             news = News()
             news.title = request.form.get('title')
@@ -314,7 +315,9 @@ def admin_post_news():
             print(news.id, 'sadasdasd')
             print(db_sess.query(News).all())
             return "Форма отправленна"
-        return render_template('admin_post_news.html', form=form)
+        else:
+            flash('Неподдерживаемый файл', 'error')
+    return render_template('admin_post_news.html', form=form)
 
 
 @app.route('/news')

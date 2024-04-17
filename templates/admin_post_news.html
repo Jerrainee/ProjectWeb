@@ -2,9 +2,6 @@
 
 {% block content %}
 {{ super() }}
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}">{{msg}}</div>
-{% endfor %}
 <p><a href="/admin">Вернуться на страницу панели администратора.</a></p>
 <form action="{{url_for('admin_post_news')}}" method = "post" class="form-contact" enctype="multipart/form-data">
     <p><label>Название новости:</label>{{ form.news_title }}</p>
