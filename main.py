@@ -298,26 +298,26 @@ def admin_post_news():
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
-    # if user.is_admin != 1:
-    #     flash('У вас нет доступа к этой странице!', 'error')
-    #     return redirect('/')
-    # else:
-    form = PostNewsForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            news = News()
-            news.title = request.form.get('title')
-            news.content = request.form.get('txt')
-            news.author_id = user.id
-            news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
-            db_sess.add(news)
-            db_sess.commit()
-            print(news.id, 'sadasdasd')
-            print(db_sess.query(News).all())
-            return "Форма отправленна"
-        else:
-            flash('Неподдерживаемый файл', 'error')
-    return render_template('admin_post_news.html', form=form)
+    if user.is_admin != 1:
+        flash('У вас нет доступа к этой странице!', 'error')
+        return redirect('/')
+    else:
+        form = PostNewsForm()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                news = News()
+                news.title = request.form.get('title')
+                news.content = request.form.get('txt')
+                news.author_id = user.id
+                news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+                db_sess.add(news)
+                db_sess.commit()
+                print(news.id, 'sadasdasd')
+                print(db_sess.query(News).all())
+                return "Форма отправленна"
+            else:
+                flash('Неподдерживаемый файл', 'error')
+        return render_template('admin_post_news.html', form=form)
 
 
 @app.route('/news')
