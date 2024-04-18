@@ -1,12 +1,10 @@
 import datetime
 
 import requests
-import wtforms
-from flask import Flask, render_template, redirect, request, flash, abort, make_response, jsonify
+from flask import Flask, render_template, redirect, request, flash, abort
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from data import db_session
-from TestAdd.addTestData import add_tests, add_test_users
 from data.forum_posts import ForumPost
 from data.news import News
 from data.tests_comments import Comment
@@ -19,8 +17,6 @@ from forms.post_news_form import PostNewsForm
 from test_functional import TestFunc
 from data.users import User
 from data.tests import Test
-from data.forum_messages import Message
-from UserLogin import UserLogin
 
 import base64
 
@@ -95,7 +91,7 @@ def account(i):
 @app.route('/change_profile', methods=['GET', 'POST'])
 @login_required
 def change_profile():
-    form, message = ProfileForm(), ''
+    form = ProfileForm()
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).get(current_user.get_id())
     if request.method == 'GET':
@@ -111,7 +107,7 @@ def change_profile():
             return redirect('/account')
         else:
             flash('Пользователь с таким ником уже существует!', 'error')
-    return render_template('change_profile.html', form=form, message=message)
+    return render_template('change_profile.html', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -119,16 +115,13 @@ def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
+            flash('Пароли не совпадают!', 'error')
+            return render_template('register.html', title='Регистрация', form=form)
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
+            flash('Такой пользователь уже есть!', 'error')
+            return render_template('register.html', title='Регистрация',form=form)
         resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
-        print(resp)
         user = User(
             is_admin=0,
             name=form.name.data,
@@ -152,9 +145,8 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
+        flash('Неправильный логин или пароль!', 'error')
+        return render_template('login.html', form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -261,7 +253,7 @@ def delete_comment(i):
     db_sess = db_session.create_session()
     cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
     cur_test = cur_comm.test.id
-    if cur_comm and current_user.get_id() == i:
+    if cur_comm and int(current_user.get_id()) == cur_comm.author_id:
         db_sess.delete(cur_comm)
         db_sess.commit()
     else:
@@ -304,7 +296,6 @@ def delete_message(i):
 
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
-    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
@@ -322,9 +313,8 @@ def admin_post_news():
                 news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
                 db_sess.add(news)
                 db_sess.commit()
-                print(news.id, 'sadasdasd')
-                print(db_sess.query(News).all())
-                return "Форма отправленна"
+                flash('Форма успешно добавлена', 'success')
+                return redirect('/news')
             else:
                 flash('Неподдерживаемый файл', 'error')
         return render_template('admin_post_news.html', form=form)
@@ -349,8 +339,6 @@ def showForum():
 
 @app.route('/support', methods=["POST", "GET"])
 def support():
-    # Необходимо реализовать функционал добавления и отправки сообщения через sqlalchemy
-    # ДОБАВЬТЕ ТАБЛИЦУ С ОБРАЩЕНИЯМИ
     if request.method == "POST":
         db_sess = db_session.create_session()
         mes = SupportMessage()
@@ -362,13 +350,7 @@ def support():
         db_sess.commit()
         db_sess.flush()
         flash('Сообщение успешно отправлено!', category="success")
-    '''
-        res = # вызов булевой функции, подтверждающей отправление сообщения
-        if res:
-            flash('Сообщение успешно отправлено!', category="success")
-        else:
-            flash('Не удалось отправить сообщение!','error')
-    '''
+        return redirect('/')
     return render_template("support.html")
 
 
