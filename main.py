@@ -257,7 +257,7 @@ def delete_comment(i):
     db_sess = db_session.create_session()
     cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
     cur_test = cur_comm.test.id
-    if cur_comm and current_user.get_id() == i:
+    if cur_comm and int(current_user.get_id()) == cur_comm.author_id:
         db_sess.delete(cur_comm)
         db_sess.commit()
     else:
@@ -308,6 +308,7 @@ def admin_post_news():
                 news.author_id = user.id
                 news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
                 db_sess.add(news)
+                db_sess.commit()
                 flash('Форма успешно добавлена', 'success')
                 return redirect('/news')
             else:
