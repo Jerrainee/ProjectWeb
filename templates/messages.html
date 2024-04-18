@@ -5,10 +5,14 @@
 <p><a href="/admin">Вернуться на страницу панели администратора.</a></p>
 {% if msgs|length != 0 %}
 {% for msge in msgs[::-1] %}
-<h4>{{ msge.created_date }}</h4>
-<h3>{{ msge.author_name }}</h3>
-<h3>{{ msge.email }}</h3>
-<h3>{{ msge.message }}</h3>
+<div class="card mb-3" style="max-width: 18rem;">
+  <div class="card-header">{{ msge.created_date }} <form class="d-flex"><a href="delete_message/{{msge.id}}" class="btn btn-primary">Go somewhere</a></form></div>
+  <div class="card-body">
+    <h5 class="card-title">{{ msge.author_name }}</h5>
+    <p class="card-text">{{ msge.message }}</p>
+  </div>
+  <div class="card-footer bg-transparent">Email: {{ msge.email }}</div>
+</div>
 <br>
 <!-- нужен функционал отображения обращений в службу поддержки. отображать ник пользователя, его почту и текст обращения. добавить кнопку удаления обращения-->
 {% endfor %}

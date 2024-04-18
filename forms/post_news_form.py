@@ -8,4 +8,4 @@ class PostNewsForm(FlaskForm):
     news_title = StringField('Название новости', validators=[DataRequired()], name="title")
     news_text = TextAreaField('Текст новости', name="txt", validators=[DataRequired()])
     file = FileField(validators=[DataRequired(), FileAllowed(['jpg', 'png', 'jpeg'])], name='file')
-    submit = SubmitField('Войти')
+    submit = SubmitField('Выложить')

@@ -294,6 +294,14 @@ def admin_messages():
         return render_template('messages.html', msgs=msgs)
 
 
+@app.route('/admin/messages/delete_message/<int:i>')
+def delete_message(i):
+    db_sess = db_session.create_session()
+    db_sess.delete(db_sess.query(SupportMessage).get(i))
+    db_sess.commit()
+    return redirect('/admin/messages/')
+
+
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
     # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
@@ -350,7 +358,6 @@ def support():
         mes.email = request.form.get('email')
         mes.author_name = request.form.get('name')
         mes.message = request.form.get('msg')
-        print(mes.email)
         db_sess.add(mes)
         db_sess.commit()
         db_sess.flush()
