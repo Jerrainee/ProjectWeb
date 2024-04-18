@@ -40,6 +40,9 @@
   		    </li>
   		  </ul>
   		</div>
+			{% if current_user.is_authenticated %}
+                <a class="navbar-brand" style="margin-right:100px">{{ current_user.name }}</a>
+            {% endif %}
   		  <form class="d-flex" action="{{ url_for('result') }}">
   		    <input class="form-control me-2 w-200" type="text" placeholder="Search" aria-label="Search" name="search">
   		    <button class="btn btn-primary" type="submit">Search</button>
@@ -50,9 +53,6 @@
 		{% for cat, msg in get_flashed_messages(True) %}
 	        <div class="flash {{cat}}">{{msg}}</div>
         {% endfor %}
-		{% if current_user.is_authenticated %}
-        <a class="navbar-brand">{{ current_user.name }}</a>
-        {% endif %}
 	<body>
 	<main role="main" class="container">
 		{% block content %}

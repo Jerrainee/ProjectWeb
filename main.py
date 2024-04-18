@@ -149,7 +149,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        flash('Неправильный логин или пароль!')
+        flash('Неправильный логин или пароль!', 'error')
         return render_template('login.html', form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
@@ -347,13 +347,7 @@ def support():
         db_sess.commit()
         db_sess.flush()
         flash('Сообщение успешно отправлено!', category="success")
-    '''
-        res = # вызов булевой функции, подтверждающей отправление сообщения
-        if res:
-            flash('Сообщение успешно отправлено!', category="success")
-        else:
-            flash('Не удалось отправить сообщение!','error')
-    '''
+        return redirect('/')
     return render_template("support.html")
 
 

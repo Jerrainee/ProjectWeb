@@ -6,7 +6,7 @@
 {% if msgs|length != 0 %}
 {% for msge in msgs[::-1] %}
 <h4>{{ msge.created_date }}</h4>
-<h3>{{ msge.author_name }}</h3>
+<h3> <a href="/account/{{msge.author_id}}">{{ msge.author_name }}</a></h3>
 <h3>{{ msge.email }}</h3>
 <h3>{{ msge.message }}</h3>
 <br>
