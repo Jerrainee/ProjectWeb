@@ -47,12 +47,12 @@
 		</div>
 	</nav>
 	<main role="main" class="container-fluid" style="margin-top:80px">
+		{% for cat, msg in get_flashed_messages(True) %}
+	        <div class="flash {{cat}}">{{msg}}</div>
+        {% endfor %}
 		{% if current_user.is_authenticated %}
         <a class="navbar-brand">{{ current_user.name }}</a>
         {% endif %}
-	{% for cat, msg in get_flashed_messages(True) %}
-	    <div class="flash {{cat}}">{{msg}}</div>
-    {% endfor %}
 	<body>
 	<main role="main" class="container">
 		{% block content %}

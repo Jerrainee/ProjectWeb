@@ -95,7 +95,7 @@ def account(i):
 @app.route('/change_profile', methods=['GET', 'POST'])
 @login_required
 def change_profile():
-    form, message = ProfileForm(), ''
+    form = ProfileForm()
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).get(current_user.get_id())
     if request.method == 'GET':
@@ -111,7 +111,7 @@ def change_profile():
             return redirect('/account')
         else:
             flash('Пользователь с таким ником уже существует!', 'error')
-    return render_template('change_profile.html', form=form, message=message)
+    return render_template('change_profile.html', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -119,16 +119,13 @@ def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
+            flash('Пароли не совпадают!', 'error')
+            return render_template('register.html', title='Регистрация', form=form)
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
+            flash('Такой пользователь уже есть!', 'error')
+            return render_template('register.html', title='Регистрация',form=form)
         resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
-        print(resp)
         user = User(
             is_admin=0,
             name=form.name.data,
@@ -152,9 +149,8 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
+        flash('Неправильный логин или пароль!')
+        return render_template('login.html', form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -296,7 +292,6 @@ def admin_messages():
 
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
-    # Необходимо реализовать функционал проверки на доступ к админской панели через проверку условия из БД. отображать ошибку доступа при переходе на главную страницу, нужен функционал добавления новости
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
@@ -313,10 +308,8 @@ def admin_post_news():
                 news.author_id = user.id
                 news.picture = base64.b64encode(form.file.data.read()).decode('ascii')
                 db_sess.add(news)
-                db_sess.commit()
-                print(news.id, 'sadasdasd')
-                print(db_sess.query(News).all())
-                return "Форма отправленна"
+                flash('Форма успешно добавлена', 'success')
+                return redirect('/news')
             else:
                 flash('Неподдерживаемый файл', 'error')
         return render_template('admin_post_news.html', form=form)
@@ -341,8 +334,6 @@ def showForum():
 
 @app.route('/support', methods=["POST", "GET"])
 def support():
-    # Необходимо реализовать функционал добавления и отправки сообщения через sqlalchemy
-    # ДОБАВЬТЕ ТАБЛИЦУ С ОБРАЩЕНИЯМИ
     if request.method == "POST":
         db_sess = db_session.create_session()
         mes = SupportMessage()
