@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Прохождение теста</h1>
 <form method="post">
-    <label>{{ form.answers.label}}</label>
+    <label> <h3>{{ form.answers.label}}</h3></label>
     <p>{% for subfield in form.answers %}
     <tr>
         <td>{{ subfield }}</td>

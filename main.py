@@ -1,12 +1,10 @@
 import datetime
 
 import requests
-import wtforms
-from flask import Flask, render_template, redirect, request, flash, abort, make_response, jsonify
+from flask import Flask, render_template, redirect, request, flash, abort
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from data import db_session
-from TestAdd.addTestData import add_tests, add_test_users
 from data.forum_posts import ForumPost
 from data.news import News
 from data.tests_comments import Comment
@@ -19,8 +17,6 @@ from forms.post_news_form import PostNewsForm
 from test_functional import TestFunc
 from data.users import User
 from data.tests import Test
-from data.forum_messages import Message
-from UserLogin import UserLogin
 
 import base64
 

@@ -1,10 +1,6 @@
 import datetime
 import json
 
-import wtforms
-from flask import Flask, render_template, redirect, request
-from flask_login import LoginManager, login_user
-
 from data import db_session
 from data.tests import Test
 from data.users import User

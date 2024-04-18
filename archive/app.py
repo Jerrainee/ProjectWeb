@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, g, flash, session, redirect, url_for
 import os
 import sqlite3
-import FDataBase
+from archive import FDataBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from UserLogin import UserLogin
 
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm
 
 # -- Configuration --
 SECRET_KEY = '5728587e3f3ec902535e6ca60e1e98f7065dab376a661e05'
