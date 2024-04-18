@@ -1,32 +1,19 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="">
-    <h1>Просмотр профиля</h1>
-    {% if user.is_admin == 1 %}
+<div class="container">
+    <h1>Просмотр профиля</h1> <br> {% if user.is_admin == 1 %} <br>
+    <h5>Администратор сайта.</h5> {% if user.is_admin == 1 and current_user == user%} <p><a href="/admin">Перейти в
+            панель администратора.</a></p> {% endif %} {% endif %} <div class="row">
         <br>
-        <h5>Администратор сайта.</h5>
-        {% if user.is_admin == 1 and current_user == user%}
-            <p><a href="/admin">Перейти в панель администратора.</a></p>
-        {% endif %}
-    {% endif %}
-    <img src="{{ user.cat }}">
-    <h3>{{ user.name }}</h3>
-    <h5>Описание:</h5>
-    <p class="container"> {{ user.about }}</p>
-    {% if current_user == user %}
-        <p><a href="/change_profile" class="btn btn-secondary">Настроить профиль</a>
-        <a href="/logout" class="btn btn-secondary">Выйти</a></p>
-    {% endif %}
-    <br>
+        <div class="col-md-3"> <img src="{{ user.cat }}" class="img-fluid"> </div>
+        <div class="col-md-9">
+            <h3>{{ user.name }}</h3>
+            <h5>Описание:</h5>
+            <p class="container"> {{ user.about }}</p> {% if current_user == user %} <p><a href="/change_profile"
+                    class="btn btn-secondary">Настроить профиль</a> <a href="/logout"
+                    class="btn btn-secondary">Выйти</a></p> {% endif %}
+        </div>
+    </div> <br>
     <h5>Результаты тестов:</h5>
-</div>
-{% if dct %}
-    {% for i in dct.keys() %}
-        <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p>
-    {% endfor %}
-{% else %}
-    <p>Здесь пока что пусто..</p>
-{% endif %}
-
-{% endblock %}
+</div> {% if dct %} {% for i in dct.keys() %} <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p> {% endfor %} {%
+else %} <p>Здесь пока что пусто..</p> {% endif %} {% endblock %}
