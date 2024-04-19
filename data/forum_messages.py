@@ -10,6 +10,7 @@ class Message(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     content = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    picture = sqlalchemy.Column(sqlalchemy.TEXT, nullable=True, default=None)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"), nullable=True)
     post_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("posts.id"))
     date_of_creation = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)

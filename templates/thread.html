@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<h1>{{ thread.title }}</h1>
+<h4>{{ thread.content }}</h4>
+<div class="col-md-4">
+    <img src="data:image/png;base64,{{ thread.picture }}" class="img-fluid rounded-start">
+</div>
+<a type="button" class="btn btn-primary" href="/forum/{{ thread.id }}/write_message" role="button">Написать</a>
+{% for message in thread.messages %}
+<h1>{{ message.content }}</h1>
+<div class="col-md-4">
+    <img src="data:image/png;base64,{{ message.picture }}" class="img-fluid rounded-start">
+</div>
+{% endfor %}
+{% endblock %}

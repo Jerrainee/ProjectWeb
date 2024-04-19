@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<form method = "post" class="form-contact" enctype="multipart/form-data">
+    <p><label>Заголовок треда:</label>{{ form.thread_title }}</p>
+    <p><label>Описание:</label></p>
+    <p>{{ form.tread_content(rows="7", cols="40") }}</p>
+    <p><label>Картинка новости: </label></p>
+    <p>{{ form.hidden_tag() }}{{ form.file }}</p>
+    <p>{{ form.submit }}</p>
+</form>
+{% endblock %}

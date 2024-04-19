@@ -6,6 +6,7 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 
 from data import db_session
 from data.forum_posts import ForumPost
+from data.forum_messages import Message
 from data.news import News
 from data.tests_comments import Comment
 from data.support import SupportMessage
@@ -13,6 +14,7 @@ from forms.user import RegisterForm, LoginForm, ProfileForm
 from forms.test_form import TestForm
 from forms.comment import CommentForm
 from forms.post_news_form import PostNewsForm
+from forms.thread_form import CreateThreadForm, WriteMessageForm
 
 from test_functional import TestFunc
 from data.users import User
@@ -111,7 +113,7 @@ def change_profile():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -120,7 +122,7 @@ def reqister():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             flash('Такой пользователь уже есть!', 'error')
-            return render_template('register.html', title='Регистрация',form=form)
+            return render_template('register.html', title='Регистрация', form=form)
         resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
         user = User(
             is_admin=0,
@@ -297,7 +299,6 @@ def delete_message(i):
 
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
-
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
@@ -333,9 +334,70 @@ def showForum():
     # необходимо сделать переход к посту, чтоб там были комменты
 
     db_sess = db_session.create_session()
+    # new_thread = ForumPost()
+    # new_thread.title = 'etvjt'
+    # new_thread.content = 'ябятбябя'
+    # new_thread.author_id = current_user.get_id()
+    # db_sess.add(new_thread)
+    # db_sess.commit()
+    # new_message = Message()
+    # new_message.content = 'asdasdasf'
+    # new_message.author_id = current_user.get_id()
+    # new_message.post_id = new_thread.id
+    # db_sess.add(new_message)
+    # db_sess.commit()
     posts = db_sess.query(ForumPost).all()
+    print(posts)
+    return render_template('forum.html', branches=posts)
 
-    return render_template('forum.html', posts=posts)
+
+@app.route('/forum/<int:thread_id>')
+def show_thread(thread_id):
+    db_sess = db_session.create_session()
+    thread = db_sess.query(ForumPost).get(thread_id)
+    if thread:
+        return render_template('thread.html', thread=thread)
+    abort(404)
+
+
+@app.route('/forum/create_thread', methods=['POST', 'GET'])
+def create_thread():
+    form = CreateThreadForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            new_thread = ForumPost()
+            new_thread.title = request.form.get('title')
+            new_thread.content = request.form.get('content')
+            new_thread.author_id = current_user.get_id()
+            new_thread.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+            db_sess.add(new_thread)
+            db_sess.commit()
+            flash('Форма успешно добавлена', 'success')
+            return redirect('/forum')
+        else:
+            flash('Неподдерживаемый файл', 'error')
+    return render_template('create_thread.html', form=form)
+
+
+@app.route('/forum/<int:thread_id>/write_message', methods=['POST', 'GET'])
+def write_message(thread_id):
+    form = WriteMessageForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            new_message = Message()
+            new_message.content = request.form.get('content')
+            new_message.author_id = current_user.get_id()
+            new_message.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+            new_message.post_id = thread_id
+            db_sess.add(new_message)
+            db_sess.commit()
+            flash('Форма успешно добавлена', 'success')
+            return redirect(f'/forum/{thread_id}')
+        else:
+            flash('Неподдерживаемый файл', 'error')
+    return render_template('write_message.html', form=form)
 
 
 @app.route('/support', methods=["POST", "GET"])
