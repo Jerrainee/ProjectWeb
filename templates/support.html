@@ -2,14 +2,21 @@
 
 {% block content %}
 {{ super() }}
-<h3>Обращение в Администрацию сайта</h3>
+<h2>Обращение в Администрацию сайта</h2>
 <br>
 <h5>Не забудьте упомянуть контактную информацию в тексте сообщения!</h5>
 <form action="/support" method="post" class="support" enctype="multipart/form-data">
-    <p><label>Контактный email: </label> <input type="email" name="email" value="" required />
-    <p><label>Имя и фамилия (через пробел): </label> <input type="text" name="name" value="" required />
-    <p><label>Сообщение: </label> 
-    <p><textarea name="msg" value="" required ></textarea>
-    <p><input type="submit" value="Отправить" />
+    <div class="mb-3">
+    <label class="form-label">Контактный email: </label> <input class="form-control" type="email" name="email" value="" required />
+        </div>
+    <div class="mb-3">
+    <label class="form-label">Имя и фамилия (через пробел): </label> <input class="form-control" type="text" name="name" value="" required />
+        </div>
+    <div class="mb-3">
+    <label class="form-label">Сообщение: </label>
+    <textarea class="form-control" name="msg" value="" required ></textarea>
+        </div>
+    <input type="submit" value="Отправить" class="btn btn-dark"/>
+
 </form>
 {% endblock %}

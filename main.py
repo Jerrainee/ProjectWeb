@@ -225,6 +225,7 @@ def test_run(i, n):
             flash('Пожалуйста, выберите вариант ответа!', 'error')
             return redirect(f'/test/{i}/{n}')
         cur_res.append(int(request.form.get('answers')))
+        print(request.form.get('answers'))
         return redirect(f'/test/{i}/{n + 1}')
 
 

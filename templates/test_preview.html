@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h>Информация о тесте</h>
-<div class="">
-    <h1>{{ test.name }}</h1>
-    <div class="container">
-        <div class="text">{{ test.description }}</div>
-      </div>
-    <button onclick="location.href='/test/{{ test.id }}/0'" class="btn btn-dark">Пройти тест</button>
+<div class="card" style="max-width: 820px;">
+  <div class="card-header">Информация о тесте</div>
+  <div class="card-body">
+    <h5 class="card-title">{{ test.name }}</h5>
+    <p class="card-text">{{ test.description }}</p>
+    <a href="/test/{{ test.id }}/0" class="btn btn-dark">Пройти тест</a>
+      {% if current_user.is_authenticated %}
+          <a href="/write_comment/{{test.id}}" class="btn btn-dark">Оставить комментарий</a>
+      {% endif %}
+  </div>
 </div>
-<h2>Комментрарии</h2>
-<button onclick="location.href='/write_comment/{{test.id}}'" class="btn btn-secondary">Оставить комментарий</button>
+<h2>Комментарии</h2>
 {% for comment in test.comments %}
-    <div class="list-group">
-        <p class="list-group-item"> <small><a href="/account/{{comment.author.id}}">{{comment.author.name}}</a>
-                        {{comment.date_of_creation}}</small><br>
+    <div class="list-group" style="margin-top:10px">
+        <p class="list-group-item" style="max-width: 520px;">  <small><a href="/account/{{comment.author.id}}">{{comment.author.name}}</a>
+                        {{comment.date_of_creation.date()}}</small><br>
             {{comment.content}}<br>
         {% if current_user.is_authenticated and current_user == comment.author %}
             <a href="/comment_delete/{{ comment.id }}" class="btn btn-danger">Удалить</a></p>

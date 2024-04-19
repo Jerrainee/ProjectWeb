@@ -1,19 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <h1>Просмотр профиля</h1> <br> {% if user.is_admin == 1 %} <br>
-    <h5>Администратор сайта.</h5> {% if user.is_admin == 1 and current_user == user%} <p><a href="/admin">Перейти в
-            панель администратора.</a></p> {% endif %} {% endif %} <div class="row">
+    <h1>Просмотр профиля</h1> <br>
+    {% if user.is_admin == 1 %} <br>
+        <h5 class="alert alert-light">Администратор сайта.</h5>
+    {% endif %}
+    <div class="row">
         <br>
-        <div class="col-md-3"> <img src="{{ user.cat }}" class="img-fluid"> </div>
+        <div class="col-md-3"><img src="{{ user.cat }}" class="img-thumbnail" alt="..."></div>
         <div class="col-md-9">
-            <h3>{{ user.name }}</h3>
-            <h5>Описание:</h5>
-            <p class="container"> {{ user.about }}</p> {% if current_user == user %} <p><a href="/change_profile"
-                    class="btn btn-secondary">Настроить профиль</a> <a href="/logout"
-                    class="btn btn-secondary">Выйти</a></p> {% endif %}
-        </div>
-    </div> <br>
-    <h5>Результаты тестов:</h5>
-</div> {% if dct %} {% for i in dct.keys() %} <p><a href="/test/{{ i }}">{{ i }} : {{ dct[i] }} </a></p> {% endfor %} {%
-else %} <p>Здесь пока что пусто..</p> {% endif %} {% endblock %}
+            <div class="card">
+                <div class="card-header">{{ user.name }}</div>
+                <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                <p>{{ user.about }}</p>
+                <footer class="blockquote-footer">На нашем сайте с <cite title="Source Title">{{ user.created_date.date() }}</cite></footer>
+                </blockquote>
+                </div>
+            </div>
+            </div>
+
+    {% if current_user == user %}
+        <p><a href="/change_profile" class="btn btn-dark" style="margin-top:10px">Настроить профиль</a>
+            <a href="/logout" class="btn btn-secondary" style="margin-top:10px">Выйти</a>
+        {% if user.is_admin == 1 and current_user == user%}
+        <a href="/admin" class="btn btn-warning" style="margin-top:10px">Перейти в панель администратора</a>
+        {% endif %}</p>
+    {% endif %}
+
+</div>
+        <h5>Результаты тестов:</h5>
+{% if dct %}
+    {% for i in dct.keys() %}
+     <ul class="list-group">
+        <li><a href="/test/{{ i }}" class="list-group-item" style="max-width: 520px;">{{ i }} : {{ dct[i] }} </a></li>
+         </ul>
+    {% endfor %}
+{%else %}
+    <p>Здесь пока что пусто..</p>
+{% endif %}
+{% endblock %}

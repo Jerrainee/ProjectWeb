@@ -1,15 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Прохождение теста</h1>
 <form method="post">
-    <label> <h3>{{ form.answers.label}}</h3></label>
-    <p>{% for subfield in form.answers %}
+    <div class="card">
+        <h1 class="card-header">Прохождение теста</h1>
+        <div class="card-body">
+    <h5 class="card-title"> {{ form.answers.label}}</h5>
+    <p class="card-text">{% for subfield in form.answers %}
     <tr>
-        <td>{{ subfield }}</td>
-        <td>{{ subfield.label }}</td><br>
+        <td class="form-check-label">{{ subfield }}</td>
+        <td class="form-check-label">{{ subfield.label }}</td><br>
     </tr>
     {% endfor %}</p>
-    <p>{{form.submit(type="submit", class="btn btn-primary") }}</p>
+            <p>{{form.submit(type="submit", class="btn btn-primary") }}</p>
+            </div>
+        </div>
+
 </form>
 {% endblock %}
