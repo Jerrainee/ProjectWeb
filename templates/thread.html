@@ -2,16 +2,34 @@
 
 {% block content %}
 {{ super() }}
-<h1>{{ thread.title }}</h1>
-<h4>{{ thread.content }}</h4>
-<div class="col-md-4">
-    <img src="data:image/png;base64,{{ thread.picture }}" class="img-fluid rounded-start">
+<div class="card mb-3" style="width: auto;">
+  <div class="row g-0">
+    <div class="col-md-4">
+        <img src="data:image/png;base64,{{ thread.picture }}" class="img-fluid rounded-start"></div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{ thread.title }}</h5>
+        <p class="card-text">{{ thread.content }}</p>
+        <p class="card-text"><a type="button" href="/account/{{ thread.author.id }}">{{ thread.author.name }}</a> <small class="text-body-secondary">{{ thread.created_date }}</small></p>
+      </div>
+    </div>
+  </div>
 </div>
 <a type="button" class="btn btn-primary" href="/forum/{{ thread.id }}/write_message" role="button">Написать</a>
+<br>
+<br>
 {% for message in thread.messages %}
-<h1>{{ message.content }}</h1>
-<div class="col-md-4">
-    <img src="data:image/png;base64,{{ message.picture }}" class="img-fluid rounded-start">
+<div class="card mb-3" style="width: auto;">
+  <div class="row g-0">
+    <div class="col-md-4">
+        <img src="data:image/png;base64,{{ message.picture }}" class="img-fluid rounded-start"></div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <p class="card-text">{{ message.content }}</p>
+        <p class="card-text"><a type="button" href="/account/{{ message.author.id }}">{{ message.author.name }}</a> <small class="text-body-secondary">{{ message.date_of_creation }}</small></p>
+      </div>
+    </div>
+  </div>
 </div>
 {% endfor %}
 {% endblock %}

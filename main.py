@@ -331,21 +331,7 @@ def showNews():
 
 @app.route('/forum')
 def showForum():
-    # необходимо сделать переход к посту, чтоб там были комменты
-
     db_sess = db_session.create_session()
-    # new_thread = ForumPost()
-    # new_thread.title = 'etvjt'
-    # new_thread.content = 'ябятбябя'
-    # new_thread.author_id = current_user.get_id()
-    # db_sess.add(new_thread)
-    # db_sess.commit()
-    # new_message = Message()
-    # new_message.content = 'asdasdasf'
-    # new_message.author_id = current_user.get_id()
-    # new_message.post_id = new_thread.id
-    # db_sess.add(new_message)
-    # db_sess.commit()
     posts = db_sess.query(ForumPost).all()
     print(posts)
     return render_template('forum.html', branches=posts)
@@ -377,7 +363,9 @@ def create_thread():
             return redirect('/forum')
         else:
             flash('Неподдерживаемый файл', 'error')
-    return render_template('create_thread.html', form=form)
+    if current_user.is_authenticated:
+        return render_template('create_thread.html', form=form)
+    return abort(401)
 
 
 @app.route('/forum/<int:thread_id>/write_message', methods=['POST', 'GET'])
@@ -397,7 +385,9 @@ def write_message(thread_id):
             return redirect(f'/forum/{thread_id}')
         else:
             flash('Неподдерживаемый файл', 'error')
-    return render_template('write_message.html', form=form)
+    if current_user.is_authenticated:
+        return render_template('write_message.html', form=form)
+    return abort(401)
 
 
 @app.route('/support', methods=["POST", "GET"])

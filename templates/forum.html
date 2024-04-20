@@ -2,8 +2,35 @@
 
 {% block content %}
 {{ super() }}
+<a class="btn btn-primary btn-lg btn-block" href="/forum/create_thread" type="button" style="margin-bottom: 10px;">Начать обсуждение</a>
 {% if branches|length != 0 %}
 {% for branch in branches[::-1] %}
+            <div class="col-sm-6 mb-3">
+                <div class="card" style="width: auto">
+                    <div class="card-header">
+                         <div class="row justify-content-around">
+                              <div class="col-5">
+                                  <a type="button" href="/account/{{ branch.author.id }}">{{ branch.author.name }}</a>
+                              </div>
+                              <div class="col-5">
+                                  {{ branch.created_date }}
+                              </div>
+                            </div>
+
+                    </div>
+                    <div class="card-body">
+                    <div class="row">
+                       <div class="col-sm-6">
+                          <h5 class="card-title">{{branch.title}}</h5>
+                           <p class="card-text">{{branch.content}}</p>
+                        </div>
+                        <img class="col-sm-6 img-fluid rounded-start" src="data:image/png;base64,{{ branch.picture }}" alt="sans"/>
+                    </div>
+                    <a class="btn btn-primary" href="forum/{{ branch.id }}" role="button">Посетить</a>
+                    </div>
+                </div>
+            </div>
+<!--
 <h4>{{branch.title}}</h4>
 <p>{{branch.content}}</p>
 <div class="col-md-4">
@@ -12,6 +39,7 @@
 <p class="card-text"><small class="text-body-secondary"><a href="/account/{{branch.author_id}}">{{branch.author.username}}</a> {{branch.created_date}}</small></p>
 <a class="btn btn-primary" href="forum/{{ branch.id }}" role="button">Посетить</a>
 <p>--------------------</p>
+-->
 {% endfor %}
 {% else %}
 <h4>Веток форума пока нет!</h4>
