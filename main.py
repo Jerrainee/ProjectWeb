@@ -220,7 +220,7 @@ def test_run(i, n):
             form = TestForm()
             form.answers.label = qst
             form.answers.choices = [(i, ans[i]) for i in ans.keys()]
-            return render_template('test_run.html', form=form)
+            return render_template('test_run.html', form=form, n=(n + 1), length=len(cur_query.data))
         elif res == '1':
             return redirect(f'/test/{i}/result')
     elif request.method == 'POST':

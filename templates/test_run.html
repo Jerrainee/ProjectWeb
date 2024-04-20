@@ -3,7 +3,10 @@
 {% block content %}
 <form method="post">
     <div class="card">
-        <h1 class="card-header">Прохождение теста</h1>
+        <div class="card" style="width: auto">
+                    <div class="card-header">
+                                  <h1>Прохождение теста {{ n }}/{{ length }}</h1>
+                    </div>
         <div class="card-body">
     <h5 class="card-title"> {{ form.answers.label}}</h5>
     <p class="card-text">{% for subfield in form.answers %}
