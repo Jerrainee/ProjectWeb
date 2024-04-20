@@ -10,23 +10,27 @@
       <div class="card-body">
         <h5 class="card-title">{{ thread.title }}</h5>
         <p class="card-text">{{ thread.content }}</p>
-        <p class="card-text"><a type="button" href="/account/{{ thread.author.id }}">{{ thread.author.name }}</a> <small class="text-body-secondary">{{ thread.created_date }}</small></p>
+        <p class="card-text"><a href="/account/{{ thread.author.id }}">{{ thread.author.name }}</a> <small class="text-body-secondary">{{ thread.created_date }}</small></p>
       </div>
     </div>
   </div>
 </div>
-<a type="button" class="btn btn-primary" href="/forum/{{ thread.id }}/write_message" role="button">Написать</a>
-<br>
-<br>
+<a type="button" class="btn btn-dark" href="/forum/{{ thread.id }}/write_message" role="button">Написать</a>
+<h2>Комментарии</h2>
 {% for message in thread.messages %}
-<div class="card mb-3" style="width: auto;">
+<div class="card mb-3" style="max-width: 540px;">
   <div class="row g-0">
+    {% if message.picture %}
     <div class="col-md-4">
         <img src="data:image/png;base64,{{ message.picture }}" class="img-fluid rounded-start"></div>
+    {% endif %}
     <div class="col-md-8">
       <div class="card-body">
+        <p class="card-text"><a href="/account/{{ message.author.id }}">{{ message.author.name }}</a> <small class="text-body-secondary">{{ message.date_of_creation }}</small></p>
         <p class="card-text">{{ message.content }}</p>
-        <p class="card-text"><a type="button" href="/account/{{ message.author.id }}">{{ message.author.name }}</a> <small class="text-body-secondary">{{ message.date_of_creation }}</small></p>
+        {% if current_user.is_authenticated and current_user == message.author %}
+            <a href="/forum/message_delete/{{ message.id }}" class="btn btn-danger">Удалить</a></p>
+        {% endif %}
       </div>
     </div>
   </div>

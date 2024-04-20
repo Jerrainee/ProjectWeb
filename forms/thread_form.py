@@ -14,5 +14,5 @@ class CreateThreadForm(FlaskForm):
 class WriteMessageForm(FlaskForm):
     message_content = StringField('Содержимое сообщения', validators=[DataRequired()], name="content",
                                   description='Введите сообщение')
-    file = FileField(validators=[DataRequired(), FileAllowed(['jpg', 'png', 'jpeg'])], name='file')
+    file = FileField(validators=[FileAllowed(['jpg', 'png', 'jpeg'])], name='file')
     submit = SubmitField('Создать')

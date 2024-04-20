@@ -4,6 +4,7 @@ import requests
 from flask import Flask, render_template, redirect, request, flash, abort
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
+from TestAdd.addTestData import add_tests
 from data import db_session
 from data.forum_posts import ForumPost
 from data.forum_messages import Message
@@ -333,7 +334,6 @@ def showNews():
 def showForum():
     db_sess = db_session.create_session()
     posts = db_sess.query(ForumPost).all()
-    print(posts)
     return render_template('forum.html', branches=posts)
 
 
@@ -344,6 +344,22 @@ def show_thread(thread_id):
     if thread:
         return render_template('thread.html', thread=thread)
     abort(404)
+
+@app.route("/forum/post_delete/<int:i>")
+def forum_post_delete(i):
+    db_sess = db_session.create_session()
+    cur_post = db_sess.query(ForumPost).filter(ForumPost.id == i).first()
+    if cur_post and int(current_user.get_id()) == cur_post.author_id:
+        post_messages = db_sess.query(Message).filter(Message.post_id == cur_post.id).all()
+        db_sess.delete(cur_post)
+        print(post_messages, 1231231234123)
+        for mess in post_messages:
+            db_sess.delete(mess)
+        db_sess.commit()
+    else:
+        return abort(404)
+    return redirect(f'/forum')
+
 
 
 @app.route('/forum/create_thread', methods=['POST', 'GET'])
@@ -367,6 +383,18 @@ def create_thread():
         return render_template('create_thread.html', form=form)
     return abort(401)
 
+@app.route('/forum/message_delete/<int:i>')
+def delete_forum_message(i):
+    db_sess = db_session.create_session()
+    cur_mess = db_sess.query(Message).filter(Message.id == i).first()
+    cur_tread = cur_mess.post_id
+    if cur_mess and int(current_user.get_id()) == cur_mess.author_id:
+        db_sess.delete(cur_mess)
+        db_sess.commit()
+    else:
+        return abort(404)
+    return redirect(f'/forum/{cur_tread}')
+
 
 @app.route('/forum/<int:thread_id>/write_message', methods=['POST', 'GET'])
 def write_message(thread_id):
@@ -377,7 +405,8 @@ def write_message(thread_id):
             new_message = Message()
             new_message.content = request.form.get('content')
             new_message.author_id = current_user.get_id()
-            new_message.picture = base64.b64encode(form.file.data.read()).decode('ascii')
+            if form.file.data:
+                new_message.picture = base64.b64encode(form.file.data.read()).decode('ascii')
             new_message.post_id = thread_id
             db_sess.add(new_message)
             db_sess.commit()
@@ -410,7 +439,7 @@ def support():
 def main():
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    # add_tests(db_sess)
+    #add_tests(db_sess)
     app.run(debug=True)
 
 

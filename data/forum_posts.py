@@ -13,6 +13,6 @@ class ForumPost(SqlAlchemyBase):
     content = sqlalchemy.Column(sqlalchemy.TEXT, nullable=False)
     picture = sqlalchemy.Column(sqlalchemy.TEXT, nullable=True, default=None)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now().replace(microsecond=0))
     messages = orm.relationship("Message")
     author = orm.relationship('User', overlaps="posts")

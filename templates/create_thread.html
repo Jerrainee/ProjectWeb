@@ -2,12 +2,18 @@
 
 {% block content %}
 {{ super() }}
+<h2>Создание поста</h2>
 <form method = "post" class="form-contact" enctype="multipart/form-data">
-    <p><label>Заголовок треда:</label>{{ form.thread_title }}</p>
-    <p><label>Описание:</label></p>
-    <p>{{ form.tread_content(rows="7", cols="40") }}</p>
+    <div class="mb-3">
+    <label class="form-label">Заголовок треда:</label >
+        <input class="form-control" name="title" value="">
+    </div>
+    <div class="mb-3">
+    <label class="form-label">Описание:</label>
+        <textarea class="form-control" name="content" value="" required ></textarea>
+        </div>
     <p><label>Картинка новости: </label></p>
     <p>{{ form.hidden_tag() }}{{ form.file }}</p>
-    <p>{{ form.submit }}</p>
+    <input type="submit" value="Создать" class="btn btn-dark"/>
 </form>
 {% endblock %}

@@ -2,22 +2,19 @@
 
 {% block content %}
 {{ super() }}
-{% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}">{{msg}}</div>
-{% endfor %}
 <h3>Найденные тесты по запросу: "{{ request }}"</h3>
 
 <div class="row row-cols-md-3">
 {% for test in tests%}
 <div class="col mb-3">
-<div class="card" style="width: auto;">
+<div class="card h-100">
   <div class="card-body">
     <h5 class="card-title">{{test.name}}</h5>
     <p class="card-text">{{test.description}}</p>
-    <a href="test/{{test.id}}" class="card-link">Перейти к прохождению</a>
   </div>
+  <a href="test/{{test.id}}" class="btn btn-outline-primary" style="margin-bottom:10px ; width:270px; margin-left:10px;">Перейти к прохождению</a>
 </div>
-</div>
+  </div>
 {% endfor %}
 </div>
 {% endblock %}

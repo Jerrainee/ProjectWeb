@@ -2,7 +2,9 @@
 
 {% block content %}
 {{ super() }}
-<a class="btn btn-primary btn-lg btn-block" href="/forum/create_thread" type="button" style="margin-bottom: 10px;">Начать обсуждение</a>
+<div class="d-grid gap-2">
+<a class="btn btn-dark btn-lg btn-block" href="/forum/create_thread" type="button" style="margin-bottom: 10px;">Начать обсуждение</a>
+    </div>
 {% if branches|length != 0 %}
 {% for branch in branches[::-1] %}
             <div class="col-sm-6 mb-3">
@@ -10,7 +12,7 @@
                     <div class="card-header">
                          <div class="row justify-content-around">
                               <div class="col-5">
-                                  <a type="button" href="/account/{{ branch.author.id }}">{{ branch.author.name }}</a>
+                                  <a href="/account/{{ branch.author.id }}">{{ branch.author.name }}</a>
                               </div>
                               <div class="col-5">
                                   {{ branch.created_date }}
@@ -26,20 +28,14 @@
                         </div>
                         <img class="col-sm-6 img-fluid rounded-start" src="data:image/png;base64,{{ branch.picture }}" alt="sans"/>
                     </div>
-                    <a class="btn btn-primary" href="forum/{{ branch.id }}" role="button">Посетить</a>
+                        <p><a class="btn btn-dark" href="forum/{{ branch.id }}" role="button">Посетить</a>
+                            {% if current_user.is_authenticated and current_user == branch.author %}
+                        <a class="btn btn-danger" href="forum/post_delete/{{ branch.id }}" role="button">Удалить</a>
+                        {% endif %}</p>
                     </div>
                 </div>
             </div>
-<!--
-<h4>{{branch.title}}</h4>
-<p>{{branch.content}}</p>
-<div class="col-md-4">
-    <img src="data:image/png;base64,{{ branch.picture }}" class="img-fluid rounded-start">
-</div>
-<p class="card-text"><small class="text-body-secondary"><a href="/account/{{branch.author_id}}">{{branch.author.username}}</a> {{branch.created_date}}</small></p>
-<a class="btn btn-primary" href="forum/{{ branch.id }}" role="button">Посетить</a>
-<p>--------------------</p>
--->
+
 {% endfor %}
 {% else %}
 <h4>Веток форума пока нет!</h4>
