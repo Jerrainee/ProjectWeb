@@ -6,7 +6,7 @@
 {% if msgs|length != 0 %}
 {% for msge in msgs[::-1] %}
 <div class="card mb-3" style="max-width: 18rem;">
-  <div class="card-header">{{ msge.created_date }} <form class="d-flex"><a href="delete_message/{{msge.id}}" class="btn btn-primary">Go somewhere</a></form></div>
+  <div class="card-header">{{ msge.created_date }} <form class="d-flex"><a href="delete_message/{{msge.id}}" class="btn btn-danger">Delete</a></form></div>
   <div class="card-body">
       <h5 class="card-title"><a href="/account/{{msge.author_id}}">{{ msge.author_name }}</a></h5>
     <p class="card-text">{{ msge.message }}</p>

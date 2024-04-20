@@ -31,8 +31,8 @@ class TestFunc():
 
     def result(self, cur_res):
         dct_data = {}
-        for i in cur_res:
-            dct_data[i] = cur_res.count(i)
+        for i in cur_res.values():
+            dct_data[i] = list(cur_res.values()).count(i)
         dct_res = sorted(dct_data.items(), key=lambda x: x[1], reverse=True)
         return self.res[dct_res[0][0]]
 

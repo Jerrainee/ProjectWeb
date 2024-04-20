@@ -29,7 +29,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-cur_res = []
+cur_res = dict()
 
 
 @login_manager.user_loader
@@ -200,21 +200,22 @@ def result_page(i):
         dct[i] = res
         cur_user.test_results = str(dct)
         db_sess.commit()
-    cur_res = []
-
+    cur_res = dict()
     return render_template('test_result.html', res=res, test=cur_test)
 
 
 @app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
 def test_run(i, n):
+
     global cur_res
+    db_sess = db_session.create_session()
+    cur_test = db_sess.query(Test).filter(Test.id == i).first()
+    db_sess.close()
+    if not cur_test:
+        return abort(404)
+    cur_query = TestFunc(cur_test)
+    res = cur_query.run(n)
     if request.method == 'GET':
-        db_sess = db_session.create_session()
-        cur_test = db_sess.query(Test).filter(Test.id == i).first()
-        if not cur_test:
-            return abort(404)
-        cur_query = TestFunc(cur_test)
-        res = cur_query.run(n)
         if len(res) == 2:
             qst, ans = res
             form = TestForm()
@@ -227,7 +228,7 @@ def test_run(i, n):
         if not request.form.get('answers'):
             flash('Пожалуйста, выберите вариант ответа!', 'error')
             return redirect(f'/test/{i}/{n}')
-        cur_res.append(int(request.form.get('answers')))
+        cur_res[res[0]] = int(request.form.get('answers'))
         print(request.form.get('answers'))
         return redirect(f'/test/{i}/{n + 1}')
 
