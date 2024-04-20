@@ -44,7 +44,7 @@ def result():
     db_sess = db_session.create_session()
     res = []
     tests = db_sess.query(Test).all()
-    db_sess.close()
+    db_sess.commit()
     for i in tests:
         cur_search = ' '.join([str(i).lower() for i in str(i).split(';;')[1].split()])
         for word in search_query:
@@ -64,7 +64,7 @@ def result():
 def home():
     db_sess = db_session.create_session()
     tests = db_sess.query(Test).all()
-    db_sess.close()
+    db_sess.commit()
     print(tests[-1].id)
     return render_template('main.html', tests=tests)
 
@@ -74,7 +74,7 @@ def profile():
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         cur_user = db_sess.query(User).get(current_user.get_id())
-        db_sess.close()
+        db_sess.commit()
         dct = {}
         if cur_user.test_results:
             dct = eval(cur_user.test_results)
@@ -87,7 +87,7 @@ def account(i):
     dct = {}
     db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
-    db_sess.close()
+    db_sess.commit()
     if not cur_user:
         return abort(404)
     if cur_user.test_results:
@@ -114,7 +114,7 @@ def change_profile():
             return redirect('/account')
         else:
             flash('Пользователь с таким ником уже существует!', 'error')
-    db_sess.close()
+    db_sess.commit()
     return render_template('change_profile.html', form=form)
 
 
@@ -127,7 +127,7 @@ def register():
             return render_template('register.html', title='Регистрация', form=form)
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            db_sess.close()
+            db_sess.commit()
             flash('Такой пользователь уже есть!', 'error')
             return render_template('register.html', title='Регистрация', form=form)
         resp = requests.get("https://api.thecatapi.com/v1/images/search").json()[0]["url"]
@@ -151,7 +151,7 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
-        db_sess.close()
+        db_sess.commit()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -186,7 +186,7 @@ def bad_request(_):
 def page(i):
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
-    db_sess.close()
+    db_sess.commit()
     if not cur_test:
         return abort(404)
     return render_template('test_preview.html', test=cur_test)
@@ -198,7 +198,7 @@ def result_page(i):
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
     if not cur_test or not cur_res:
-        db_sess.close()
+        db_sess.commit()
         return abort(400)
     res = TestFunc(cur_test).result(cur_res)
     if current_user.is_authenticated:
@@ -210,7 +210,7 @@ def result_page(i):
         cur_user.test_results = str(dct)
         db_sess.commit()
     cur_res = dict()
-    db_sess.close()
+    db_sess.commit()
     return render_template('test_result.html', res=res, test=cur_test)
 
 
@@ -220,7 +220,7 @@ def test_run(i, n):
     global cur_res
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
-    db_sess.close()
+    db_sess.commit()
     if not cur_test:
         return abort(404)
     cur_query = TestFunc(cur_test)
@@ -272,7 +272,7 @@ def delete_comment(i):
         db_sess.delete(cur_comm)
         db_sess.commit()
     else:
-        db_sess.close()
+        db_sess.commit()
         return abort(404)
     return redirect(f'/test/{cur_test}')
 
@@ -282,7 +282,7 @@ def delete_comment(i):
 def admin():
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
-    db_sess.close()
+    db_sess.commit()
     if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
         return redirect('/')
@@ -296,12 +296,12 @@ def admin_messages():
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
-        db_sess.close()
+        db_sess.commit()
         flash('У вас нет доступа к этой странице!', 'error')
         return redirect('/')
     else:
         msgs = db_sess.query(SupportMessage).all()
-        db_sess.close()
+        db_sess.commit()
         return render_template('messages.html', msgs=msgs)
 
 
@@ -318,7 +318,7 @@ def admin_post_news():
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
-        db_sess.close()
+        db_sess.commit()
         flash('У вас нет доступа к этой странице!', 'error')
         return redirect('/')
     else:
@@ -336,7 +336,7 @@ def admin_post_news():
                 return redirect('/news')
             else:
                 flash('Неподдерживаемый файл', 'error')
-        db_sess.close()
+        db_sess.commit()
         return render_template('admin_post_news.html', form=form)
 
 
@@ -344,7 +344,7 @@ def admin_post_news():
 def showNews():
     db_sess = db_session.create_session()
     news = db_sess.query(News).all()
-    db_sess.close()
+    db_sess.commit()
     return render_template('news.html', news=news)
 
 
@@ -352,7 +352,7 @@ def showNews():
 def showForum():
     db_sess = db_session.create_session()
     posts = db_sess.query(ForumPost).all()
-    db_sess.close()
+    db_sess.commit()
     return render_template('forum.html', branches=posts)
 
 
@@ -360,7 +360,7 @@ def showForum():
 def show_thread(thread_id):
     db_sess = db_session.create_session()
     thread = db_sess.query(ForumPost).get(thread_id)
-    db_sess.close()
+    db_sess.commit()
     if thread:
         return render_template('thread.html', thread=thread)
     abort(404)
@@ -378,7 +378,7 @@ def forum_post_delete(i):
         db_sess.commit()
     else:
         return abort(404)
-    db_sess.close()
+    db_sess.commit()
     return redirect(f'/forum')
 
 
@@ -414,7 +414,7 @@ def delete_forum_message(i):
         db_sess.commit()
     else:
         return abort(404)
-    db_sess.close()
+    db_sess.commit()
     return redirect(f'/forum/{cur_tread}')
 
 
