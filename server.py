@@ -416,6 +416,18 @@ def delete_forum_message(i):
         return redirect(f'/forum/{cur_tread}')
 
 
+@app.route('/news_delete/<int:i>')
+def delete_news(i):
+    with db_session.create_session() as db_sess:
+        cur_new = db_sess.query(News).filter(News.id == i).first()
+        if cur_new and current_user.is_admin == 1:
+            db_sess.delete(cur_new)
+            db_sess.commit()
+        else:
+            return abort(404)
+        return redirect(f'/news')
+
+
 @app.route('/forum/<int:thread_id>/write_message', methods=['POST', 'GET'])
 def write_message(thread_id):
     with db_session.create_session() as db_sess:
