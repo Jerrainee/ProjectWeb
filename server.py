@@ -288,6 +288,21 @@ def admin():
         return render_template('admin.html')
 
 
+@app.route('/admin/delete_profile/<int:i>')
+@login_required
+def delete_profile(i):
+    if current_user.is_admin == 1:
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == i).first()
+        db_sess.delete(user)
+        db_sess.commit()
+    else:
+        flash('У вас нет доступа к этой странице!', 'error')
+    return redirect('/')
+
+
+
+
 @app.route('/admin/messages/')
 @login_required
 def admin_messages():
