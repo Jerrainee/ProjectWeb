@@ -186,7 +186,6 @@ def bad_request(_):
 def page(i):
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
-    db_sess.close()
     if not cur_test:
         return abort(404)
     return render_template('test_preview.html', test=cur_test)
@@ -210,7 +209,6 @@ def result_page(i):
         cur_user.test_results = str(dct)
         db_sess.commit()
     cur_res = dict()
-    db_sess.close()
     return render_template('test_result.html', res=res, test=cur_test)
 
 
@@ -220,7 +218,6 @@ def test_run(i, n):
     global cur_res
     db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
-    db_sess.close()
     if not cur_test:
         return abort(404)
     cur_query = TestFunc(cur_test)
@@ -240,6 +237,7 @@ def test_run(i, n):
             return redirect(f'/test/{i}/{n}')
         cur_res[res[0]] = int(request.form.get('answers'))
         print(request.form.get('answers'))
+        db_sess.close()
         return redirect(f'/test/{i}/{n + 1}')
 
 
@@ -268,7 +266,7 @@ def delete_comment(i):
     db_sess = db_session.create_session()
     cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
     cur_test = cur_comm.test.id
-    if cur_comm and int(current_user.get_id()) == cur_comm.author_id:
+    if cur_comm and (int(current_user.get_id()) == cur_comm.author_id or current_user.is_admin == 1) :
         db_sess.delete(cur_comm)
         db_sess.commit()
     else:
@@ -352,7 +350,6 @@ def showNews():
 def showForum():
     db_sess = db_session.create_session()
     posts = db_sess.query(ForumPost).all()
-    db_sess.close()
     return render_template('forum.html', branches=posts)
 
 
@@ -360,7 +357,6 @@ def showForum():
 def show_thread(thread_id):
     db_sess = db_session.create_session()
     thread = db_sess.query(ForumPost).get(thread_id)
-    db_sess.close()
     if thread:
         return render_template('thread.html', thread=thread)
     abort(404)
@@ -369,7 +365,7 @@ def show_thread(thread_id):
 def forum_post_delete(i):
     db_sess = db_session.create_session()
     cur_post = db_sess.query(ForumPost).filter(ForumPost.id == i).first()
-    if cur_post and int(current_user.get_id()) == cur_post.author_id:
+    if cur_post and (int(current_user.get_id()) == cur_post.author_id or current_user.is_admin == 1):
         post_messages = db_sess.query(Message).filter(Message.post_id == cur_post.id).all()
         db_sess.delete(cur_post)
         print(post_messages, 1231231234123)
@@ -409,7 +405,7 @@ def delete_forum_message(i):
     db_sess = db_session.create_session()
     cur_mess = db_sess.query(Message).filter(Message.id == i).first()
     cur_tread = cur_mess.post_id
-    if cur_mess and int(current_user.get_id()) == cur_mess.author_id:
+    if cur_mess and (int(current_user.get_id()) == cur_mess.author_id or current_user.is_admin == 1):
         db_sess.delete(cur_mess)
         db_sess.commit()
     else:

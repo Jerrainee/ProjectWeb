@@ -28,7 +28,7 @@
       <div class="card-body">
         <p class="card-text"><a href="/account/{{ message.author.id }}">{{ message.author.name }}</a> <small class="text-body-secondary">{{ message.date_of_creation }}</small></p>
         <p class="card-text">{{ message.content }}</p>
-        {% if current_user.is_authenticated and current_user == message.author %}
+        {% if (current_user.is_authenticated and current_user == message.author) or current_user.is_admin == 1 %}
             <a href="/forum/message_delete/{{ message.id }}" class="btn btn-danger">Удалить</a></p>
         {% endif %}
       </div>

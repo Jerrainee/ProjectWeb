@@ -18,7 +18,7 @@
         <p class="list-group-item" style="max-width: 520px;">  <small><a href="/account/{{comment.author.id}}">{{comment.author.name}}</a>
                         {{comment.date_of_creation.date()}}</small><br>
             {{comment.content}}<br>
-        {% if current_user.is_authenticated and current_user == comment.author %}
+        {% if (current_user.is_authenticated and current_user == comment.author) or current_user.is_admin == 1%}
             <a href="/comment_delete/{{ comment.id }}" class="btn btn-danger">Удалить</a></p>
         {% endif %}
     </div>

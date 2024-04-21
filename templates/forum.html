@@ -29,7 +29,7 @@
                         <img class="col-sm-6 img-fluid rounded-start" src="data:image/png;base64,{{ branch.picture }}" alt="sans"/>
                     </div>
                         <p><a class="btn btn-dark" href="forum/{{ branch.id }}" role="button">Посетить</a>
-                            {% if current_user.is_authenticated and current_user == branch.author %}
+                            {% if (current_user.is_authenticated and current_user == branch.author) or current_user.is_admin == 1 %}
                         <a class="btn btn-danger" href="forum/post_delete/{{ branch.id }}" role="button">Удалить</a>
                         {% endif %}</p>
                     </div>
