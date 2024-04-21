@@ -31,17 +31,17 @@ login_manager.init_app(app)
 
 cur_res = dict()
 
+db_sess = ''
+
 
 @login_manager.user_loader
 def load_user(user_id):
-    db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
 
 @app.route('/result')
 def result():
     search_query = request.args.get('search').split()
-    db_sess = db_session.create_session()
     res = []
     tests = db_sess.query(Test).all()
     for i in tests:
@@ -61,7 +61,6 @@ def result():
 @app.route('/')
 @app.route('/home')
 def home():
-    db_sess = db_session.create_session()
     tests = db_sess.query(Test).all()
     print(tests[-1].id)
     return render_template('main.html', tests=tests)
@@ -70,7 +69,6 @@ def home():
 @app.route('/account')
 def profile():
     if current_user.is_authenticated:
-        db_sess = db_session.create_session()
         cur_user = db_sess.query(User).get(current_user.get_id())
         dct = {}
         if cur_user.test_results:
@@ -82,7 +80,6 @@ def profile():
 @app.route('/account/<int:i>')
 def account(i):
     dct = {}
-    db_sess = db_session.create_session()
     cur_user = db_sess.query(User).filter(User.id == i).first()
     if not cur_user:
         return abort(404)
@@ -95,7 +92,6 @@ def account(i):
 @login_required
 def change_profile():
     form = ProfileForm()
-    db_sess = db_session.create_session()
     cur_user = db_sess.query(User).get(current_user.get_id())
     if request.method == 'GET':
         form.name.data = cur_user.name
@@ -120,7 +116,6 @@ def register():
         if form.password.data != form.password_again.data:
             flash('Пароли не совпадают!', 'error')
             return render_template('register.html', title='Регистрация', form=form)
-        db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             flash('Такой пользователь уже есть!', 'error')
             return render_template('register.html', title='Регистрация', form=form)
@@ -143,7 +138,6 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
@@ -177,7 +171,6 @@ def bad_request(_):
 
 @app.route('/test/<int:i>')
 def page(i):
-    db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
     if not cur_test:
         return abort(404)
@@ -187,7 +180,6 @@ def page(i):
 @app.route('/test/<int:i>/result')
 def result_page(i):
     global cur_res
-    db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
     if not cur_test or not cur_res:
         return abort(400)
@@ -206,9 +198,7 @@ def result_page(i):
 
 @app.route('/test/<int:i>/<int:n>', methods=['GET', 'POST'])
 def test_run(i, n):
-
     global cur_res
-    db_sess = db_session.create_session()
     cur_test = db_sess.query(Test).filter(Test.id == i).first()
     db_sess.close()
     if not cur_test:
@@ -238,7 +228,6 @@ def write_comment(i):
     form = CommentForm()
     if request.method == "POST":
         if current_user.is_authenticated:
-            db_sess = db_session.create_session()
             comment = Comment(
                 content=form.content.data,
                 author_id=current_user.id,
@@ -255,7 +244,6 @@ def write_comment(i):
 
 @app.route('/comment_delete/<int:i>')
 def delete_comment(i):
-    db_sess = db_session.create_session()
     cur_comm = db_sess.query(Comment).filter(Comment.id == i).first()
     cur_test = cur_comm.test.id
     if cur_comm and int(current_user.get_id()) == cur_comm.author_id:
@@ -269,7 +257,6 @@ def delete_comment(i):
 @app.route('/admin/')
 @login_required
 def admin():
-    db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
@@ -281,7 +268,6 @@ def admin():
 @app.route('/admin/messages/')
 @login_required
 def admin_messages():
-    db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
@@ -293,7 +279,6 @@ def admin_messages():
 
 @app.route('/admin/messages/delete_message/<int:i>')
 def delete_message(i):
-    db_sess = db_session.create_session()
     db_sess.delete(db_sess.query(SupportMessage).get(i))
     db_sess.commit()
     return redirect('/admin/messages/')
@@ -301,7 +286,6 @@ def delete_message(i):
 
 @app.route('/admin/post_news', methods=['POST', 'GET'])
 def admin_post_news():
-    db_sess = db_session.create_session()
     user = db_sess.query(User).get(current_user.get_id())
     if user.is_admin != 1:
         flash('У вас нет доступа к этой странице!', 'error')
@@ -326,29 +310,26 @@ def admin_post_news():
 
 @app.route('/news')
 def showNews():
-    db_sess = db_session.create_session()
     news = db_sess.query(News).all()
     return render_template('news.html', news=news)
 
 
 @app.route('/forum')
 def showForum():
-    db_sess = db_session.create_session()
     posts = db_sess.query(ForumPost).all()
     return render_template('forum.html', branches=posts)
 
 
 @app.route('/forum/<int:thread_id>')
 def show_thread(thread_id):
-    db_sess = db_session.create_session()
     thread = db_sess.query(ForumPost).get(thread_id)
     if thread:
         return render_template('thread.html', thread=thread)
     abort(404)
 
+
 @app.route("/forum/post_delete/<int:i>")
 def forum_post_delete(i):
-    db_sess = db_session.create_session()
     cur_post = db_sess.query(ForumPost).filter(ForumPost.id == i).first()
     if cur_post and int(current_user.get_id()) == cur_post.author_id:
         post_messages = db_sess.query(Message).filter(Message.post_id == cur_post.id).all()
@@ -362,13 +343,11 @@ def forum_post_delete(i):
     return redirect(f'/forum')
 
 
-
 @app.route('/forum/create_thread', methods=['POST', 'GET'])
 def create_thread():
     form = CreateThreadForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            db_sess = db_session.create_session()
             new_thread = ForumPost()
             new_thread.title = request.form.get('title')
             new_thread.content = request.form.get('content')
@@ -384,9 +363,9 @@ def create_thread():
         return render_template('create_thread.html', form=form)
     return abort(401)
 
+
 @app.route('/forum/message_delete/<int:i>')
 def delete_forum_message(i):
-    db_sess = db_session.create_session()
     cur_mess = db_sess.query(Message).filter(Message.id == i).first()
     cur_tread = cur_mess.post_id
     if cur_mess and int(current_user.get_id()) == cur_mess.author_id:
@@ -402,7 +381,6 @@ def write_message(thread_id):
     form = WriteMessageForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            db_sess = db_session.create_session()
             new_message = Message()
             new_message.content = request.form.get('content')
             new_message.author_id = current_user.get_id()
@@ -423,7 +401,6 @@ def write_message(thread_id):
 @app.route('/support', methods=["POST", "GET"])
 def support():
     if request.method == "POST":
-        db_sess = db_session.create_session()
         mes = SupportMessage()
         mes.author_id = current_user.get_id()
         mes.email = request.form.get('email')
@@ -438,9 +415,10 @@ def support():
 
 
 def main():
+    global db_sess
     db_session.global_init("db/site_DB.db")
     db_sess = db_session.create_session()
-    #add_tests(db_sess)
+    # add_tests(db_sess)
     app.run(debug=True)
 
 
